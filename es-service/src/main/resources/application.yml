@@ -1,0 +1,22 @@
+spring:
+  profiles:
+    active: test
+
+#mybatis:
+#  mapper-locations: classpath:mapper/*.xml
+#  type-aliases-package: com.izaodao.springboot2.entity
+
+#mapper:
+#  mappers:  com.izaodao.springboot2.mapper
+#  not-empty: false
+#  identity: MYSQL
+#
+##pagehelper
+#pagehelper:
+#    helperDialect: mysql
+#    reasonable: true
+#    supportMethodsArguments: true
+#    params: count=countSql
+#    returnPageInfo: check
+
+

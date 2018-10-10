@@ -1,0 +1,24 @@
+spring:
+  profiles: test
+
+  server:
+    port: 8082
+
+  rest:
+    elasticsearch:
+        cluster-name: es-cluster
+        cluster-nodes: 114.67.239.37:50004,114.67.239.37:50002
+        cluster-scheme: http
+        max-retry-time-out: 10000
+        nodes-selector: true
+        nodes-failure-listener: true
+        request-customize: true
+        http-client-customize: false
+  dubbo:
+     config:
+        application-name: es-dubbo-provider
+        registry-address: 192.168.1.219:2181
+        registry-protocol: zookeeper
+        registry-id: zookeeper
+        protocol-name: dubbo
+        protocol-port: 40012

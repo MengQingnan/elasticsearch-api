@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.izaodao</groupId>
+    <artifactId>zaodao-elasticsearch-api</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <modules>
+        <module>es-service</module>
+        <module>es-core</module>
+    </modules>
+    <packaging>pom</packaging>
+
+    <name>elasticsearch-api</name>
+    <description>zaodao elasticsearch server</description>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.5.RELEASE</version>
+        <relativePath/>
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <compiler.source>1.8</compiler.source>
+        <compiler.target>1.8</compiler.target>
+
+        <elasticsearch>6.4.2</elasticsearch>
+        <springdata.commons>2.1.0.RELEASE</springdata.commons>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--elasticsearch-->
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>${elasticsearch}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>transport</artifactId>
+                <version>${elasticsearch}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- SPRING DATA -->
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-commons</artifactId>
+                <version>${springdata.commons}</version>
+            </dependency>
+
+            <dependency>
+                <!-- required by elasticsearch -->
+                <groupId>org.elasticsearch.plugin</groupId>
+                <artifactId>transport-netty4-client</artifactId>
+                <version>${elasticsearch}</version>
+                <!--<scope>test</scope>-->
+            </dependency>
+
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-client</artifactId>
+                <version>${elasticsearch}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-high-level-client</artifactId>
+                <version>${elasticsearch}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- 发布位置配置 -->
+    <distributionManagement>
+        <repository>
+            <id>central</id>
+            <name>libs-release</name>
+            <url>https://mavenlib.izaodao.com/artifactory/libs-release</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>libs-snapshot</name>
+            <url>https://mavenlib.izaodao.com/artifactory/libs-snapshot</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <!-- 编译的时候使用JDK8和UTF8编码 -->
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>${compiler.source}</source>
+                    <target>${compiler.target}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.5</version>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

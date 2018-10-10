@@ -1,0 +1,24 @@
+spring:
+  profiles: dev
+
+  server:
+    port: 8080
+
+  data:
+    elasticsearch:
+      zaodao:
+        cluster-name: elasticsearch-cluster
+        cluster-nodes: 10.42.0.136:9300,10.42.0.137:9300,10.42.0.138:9300
+        client-transport-sniff: false
+        client-ignore-cluster-name: false
+        client-ping-timeout: 10s
+        client-nodes-sampler-interval: 10s
+
+  dubbo:
+     config:
+        application-name: es-dubbo-provider
+        registry-address: 192.168.1.219:2181
+        registry-protocol: zookeeper
+        registry-id: zookeeper
+        protocol-name: dubbo
+        protocol-port: 40012
