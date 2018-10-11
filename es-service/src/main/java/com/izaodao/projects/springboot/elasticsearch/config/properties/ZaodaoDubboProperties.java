@@ -1,4 +1,4 @@
-package com.izaodao.projects.springboot.elasticsearch.config;
+package com.izaodao.projects.springboot.elasticsearch.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

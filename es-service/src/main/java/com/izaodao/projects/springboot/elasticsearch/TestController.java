@@ -22,8 +22,8 @@ public class TestController {
     public String test() {
         EsOperParamters esOperParamters = new EsOperParamters();
 
-        esOperParamters.setIndex("japanesedoyensboot");
-        esOperParamters.setType("japanese_doyen_sboot");
+        esOperParamters.setIndex("japanesedoyensboot111");
+        esOperParamters.setType("japanese_doyen_sboot111");
 
         elasticsearchService.getInfoById("taA42mMBWxdGga3plUKX", esOperParamters);
 

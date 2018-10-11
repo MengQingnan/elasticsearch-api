@@ -1,12 +1,14 @@
 package com.izaodao.projects.springboot.elasticsearch.config;
 
+import com.izaodao.projects.springboot.elasticsearch.client.ZaodaoRestHighLevelClient;
+import com.izaodao.projects.springboot.elasticsearch.config.properties.ZaodaoElasticsearchIndexProperties;
+import com.izaodao.projects.springboot.elasticsearch.config.properties.ZaodaoElasticsearchProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.Node;
 import org.elasticsearch.client.NodeSelector;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -20,13 +22,17 @@ import java.io.IOException;
 @Slf4j
 public class ZaodaoElasticsearcRestClientFactory {
     /**
-     * config 配置文件
+     * 初始化es config 配置文件
      */
     private ZaodaoElasticsearchProperties properties;
     /**
+     * 初始化es index 配置文件
+     */
+    private ZaodaoElasticsearchIndexProperties indexProperties;
+    /**
      * restHighLevelClient
      */
-    private static RestHighLevelClient restHighLevelClient;
+    private static ZaodaoRestHighLevelClient restHighLevelClient;
     /**
      * restClientBuilder
      */
@@ -37,8 +43,10 @@ public class ZaodaoElasticsearcRestClientFactory {
      */
     private static ZaodaoElasticsearcRestClientFactory restClientFactory;
 
-    private ZaodaoElasticsearcRestClientFactory(ZaodaoElasticsearchProperties properties) {
+    private ZaodaoElasticsearcRestClientFactory(ZaodaoElasticsearchProperties properties,
+                                                ZaodaoElasticsearchIndexProperties indexProperties) {
         this.properties = properties;
+        this.indexProperties = indexProperties;
     }
 
     /**
@@ -81,7 +89,7 @@ public class ZaodaoElasticsearcRestClientFactory {
             });
         }
 
-        restHighLevelClient = new RestHighLevelClient(this.restClientBuilder);
+        restHighLevelClient = new ZaodaoRestHighLevelClient(this.indexProperties, this.restClientBuilder);
     }
 
     /**
@@ -119,13 +127,14 @@ public class ZaodaoElasticsearcRestClientFactory {
         return httpHosts;
     }
 
-    public RestHighLevelClient getRestHighLevelClient() {
+    public ZaodaoRestHighLevelClient getRestHighLevelClient() {
         return restHighLevelClient;
     }
 
-    public static ZaodaoElasticsearcRestClientFactory createClientFactory(ZaodaoElasticsearchProperties properties) {
+    public static ZaodaoElasticsearcRestClientFactory createClientFactory(ZaodaoElasticsearchProperties properties,
+                                                                          ZaodaoElasticsearchIndexProperties indexProperties) {
         if (restClientFactory == null) {
-            restClientFactory = new ZaodaoElasticsearcRestClientFactory(properties);
+            restClientFactory = new ZaodaoElasticsearcRestClientFactory(properties, indexProperties);
 
             return restClientFactory;
         }

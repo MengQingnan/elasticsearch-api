@@ -1,14 +1,14 @@
-package com.izaodao.projects.springboot.elasticsearch.config;
+package com.izaodao.projects.springboot.elasticsearch.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @Auther: Mengqingnan
- * @Description: 初始化配置文件信息
+ * @Description: es rest 初始化配置文件信息
  * @Date: 2018/7/26 上午11:24
  * Copyright (c) 2018, zaodao All Rights Reserved.
  */
-@ConfigurationProperties(prefix = "spring.rest.elasticsearch")
+@ConfigurationProperties(prefix = "spring.elasticsearch.rest.config")
 public class ZaodaoElasticsearchProperties {
     /**
      * es 集群名称
