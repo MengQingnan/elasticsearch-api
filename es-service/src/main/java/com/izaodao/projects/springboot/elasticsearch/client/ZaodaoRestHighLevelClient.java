@@ -6,10 +6,13 @@ import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -126,7 +129,7 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient {
      */
     public void creatIndexAsync(String index, String type, Map<String, Object> mapping,
                                 ActionListener<CreateIndexResponse>
-        listener) throws IOException {
+                                    listener) throws IOException {
         if (!indexExist(index)) {
             CreateIndexRequest createIndexRequest = new CreateIndexRequest();
 
@@ -137,5 +140,64 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient {
             // 进行同步创建
             indices().createAsync(createIndexRequest, RequestOptions.DEFAULT, listener);
         }
+    }
+
+    /**
+     * index
+     *
+     * @param index  索引
+     * @param type   类型
+     * @param id     id
+     * @param params 参数内容
+     * @return org.elasticsearch.action.index.IndexResponse
+     * @Description 通过Map构建索引
+     * @Date 2018/11/8 7:46 PM
+     */
+    public IndexResponse index(String index, String type, String id, Map<String, Object> params) {
+        return indexCommon(index, type, id, params);
+    }
+
+    /**
+     * index
+     *
+     * @param index      索引
+     * @param type       类型
+     * @param id         id
+     * @param jsonParams 参数内容
+     * @return org.elasticsearch.action.index.IndexResponse
+     * @Description 通过Map构建索引
+     * @Date 2018/11/8 7:46 PM
+     */
+    public IndexResponse index(String index, String type, String id, String jsonParams) {
+        return indexCommon(index, type, id, jsonParams);
+    }
+
+    private IndexResponse indexCommon(String index, String type, String id, Object params) {
+        if (StringUtils.isEmpty(index)) {
+            throw new NullPointerException(" INDEX IS EMPTY ");
+        }
+
+        IndexRequest indexRequest;
+
+        if (StringUtils.isEmpty(id)) {
+            indexRequest = new IndexRequest(index, StringUtils.isEmpty(type) ? index : type);
+        } else {
+            indexRequest = new IndexRequest(index, StringUtils.isEmpty(type) ? index : type, id);
+        }
+
+        if (params instanceof Map) {
+            indexRequest.source((Map) params);
+        } else if (params instanceof String) {
+            indexRequest.source((String) params);
+        }
+
+        IndexResponse indexResponse = null;
+        try {
+            indexResponse = index(indexRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            log.error(" index data exception", e);
+        }
+
+        return indexResponse;
     }
 }

@@ -1,6 +1,7 @@
 package com.izaodao.projects.springboot.elasticsearch.interfaces;
 
 import com.izaodao.projects.springboot.elasticsearch.domain.EsOperParamters;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult;
 
 /**
  * @Auther: Mengqingnan
@@ -19,4 +20,16 @@ public interface IElasticsearchService {
      * @Date 2018/9/29 下午4:00
      */
     String getInfoById(String id, EsOperParamters esOperParamters);
+
+    /**
+     * index
+     *
+     * @param index     素银
+     * @param type      类型
+     * @param paramJson 实际参数
+     * @return void
+     * @Description 构建索引
+     * @Date 2018/11/8 6:47 PM
+     */
+    EsOperResult index(String index, String type, String id, String paramJson);
 }
