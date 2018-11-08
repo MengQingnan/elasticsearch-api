@@ -1,24 +1,31 @@
 spring:
   profiles: dev
 
-  server:
-    port: 8080
+ elasticsearch:
+       rest:
+         config:
+             cluster-name: es-cluster
+             cluster-nodes: 114.67.239.37:50004,114.67.239.37:50002
+             cluster-scheme: http
+             max-retry-time-out: 10000
+             nodes-selector: true
+             nodes-failure-listener: true
+             request-customize: true
+             http-client-customize: false
+       index:
+           config:
+             refresh-interval: 1s
+             number-of-shards: 5
+             number-of-replicas: 1
+             store-type : fs
+   dubbo:
+      config:
+         application-name: es-dubbo-provider
+         registry-address: 192.168.1.219:2181
+         registry-protocol: zookeeper
+         registry-id: zookeeper
+         protocol-name: dubbo
+         protocol-port: 40012
 
-  data:
-    elasticsearch:
-      zaodao:
-        cluster-name: elasticsearch-cluster
-        cluster-nodes: 10.42.0.136:9300,10.42.0.137:9300,10.42.0.138:9300
-        client-transport-sniff: false
-        client-ignore-cluster-name: false
-        client-ping-timeout: 10s
-        client-nodes-sampler-interval: 10s
-
-  dubbo:
-     config:
-        application-name: es-dubbo-provider
-        registry-address: 192.168.1.219:2181
-        registry-protocol: zookeeper
-        registry-id: zookeeper
-        protocol-name: dubbo
-        protocol-port: 40012
+ server:
+   port: 8080

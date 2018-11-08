@@ -1,9 +1,6 @@
 spring:
   profiles: test
 
-  server:
-    port: 8082
-
   elasticsearch:
       rest:
         config:
@@ -29,3 +26,6 @@ spring:
         registry-id: zookeeper
         protocol-name: dubbo
         protocol-port: 40012
+
+server:
+  port: 8082

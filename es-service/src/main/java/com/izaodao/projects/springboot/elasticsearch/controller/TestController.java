@@ -1,4 +1,4 @@
-package com.izaodao.projects.springboot.elasticsearch;
+package com.izaodao.projects.springboot.elasticsearch.controller;
 
 
 import com.izaodao.projects.springboot.elasticsearch.domain.EsOperParamters;
@@ -28,5 +28,9 @@ public class TestController {
         elasticsearchService.getInfoById("taA42mMBWxdGga3plUKX", esOperParamters);
 
         return "1";
+    }
+
+    public static void main(String[] args) {
+
     }
 }

@@ -1,18 +1,23 @@
 spring:
   profiles: prod
 
-  server:
-    port: 8081
-
-  data:
-    elasticsearch:
-      zaodao:
-        cluster-name: es-cluster
-        cluster-nodes: 114.67.239.37:50005,114.67.239.37:50003
-        client-transport-sniff: false
-        client-ignore-cluster-name: false
-        client-ping-timeout: 10s
-        client-nodes-sampler-interval: 10s
+elasticsearch:
+      rest:
+        config:
+            cluster-name: es-cluster
+            cluster-nodes: 114.67.239.37:50004,114.67.239.37:50002
+            cluster-scheme: http
+            max-retry-time-out: 10000
+            nodes-selector: true
+            nodes-failure-listener: true
+            request-customize: true
+            http-client-customize: false
+      index:
+          config:
+            refresh-interval: 1s
+            number-of-shards: 5
+            number-of-replicas: 1
+            store-type : fs
   dubbo:
      config:
         application-name: es-dubbo-provider
@@ -21,3 +26,6 @@ spring:
         registry-id: zookeeper
         protocol-name: dubbo
         protocol-port: 40012
+
+server:
+  port: 8081

@@ -43,17 +43,17 @@ public class ZaodaoElasticsearchIndexCheckConfiguration {
             throw new NullPointerException("EsOperParamters index is empty");
         }
 
-        String mapping = "{\n" +
-            "  \"tweet\": {\n" +
-            "    \"properties\": {\n" +
-            "      \"message\": {\n" +
-            "        \"type\": \"text\"\n" +
-            "      }\n" +
-            "    }\n" +
-            "  }\n" +
-            "}";
-
-        restHighLevelClient.creatIndex(esOperParamters.getIndex(), esOperParamters.getType(), mapping);
+//        String mapping = "{\n" +
+//            "  \"tweet\": {\n" +
+//            "    \"properties\": {\n" +
+//            "      \"message\": {\n" +
+//            "        \"type\": \"text\"\n" +
+//            "      }\n" +
+//            "    }\n" +
+//            "  }\n" +
+//            "}";
+//
+//        restHighLevelClient.creatIndex(esOperParamters.getIndex(), esOperParamters.getType(), mapping);
 
         return thisJoinPoint.proceed();
 

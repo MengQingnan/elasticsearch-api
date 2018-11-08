@@ -10,9 +10,9 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.xcontent.XContentType;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @Auther: Mengqingnan
@@ -23,10 +23,6 @@ import java.io.IOException;
 @Slf4j
 public class ZaodaoRestHighLevelClient extends RestHighLevelClient {
     /**
-     * 验证索引是否存在请求对象,ThreadLocal形式存储
-     */
-    private final ThreadLocal<GetIndexRequest> checkIndexRequestLocal = new ThreadLocal<>();
-    /**
      * 创建索引配置
      */
     private Settings.Builder settingBuilder;
@@ -34,25 +30,10 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient {
     public ZaodaoRestHighLevelClient(ZaodaoElasticsearchIndexProperties elasticsearchIndexProperties,
                                      RestClientBuilder restClientBuilder) {
         super(restClientBuilder);
-        initCheckIndex();
+
         initIndexSettingBuilder(elasticsearchIndexProperties);
     }
 
-    /**
-     * initCheckIndex
-     *
-     * @Description 初始化索引检查配置
-     * @Date 2018/10/11 2:45 PM
-     */
-    private void initCheckIndex() {
-        GetIndexRequest checkIndexRequest = new GetIndexRequest();
-
-        checkIndexRequest.local(Boolean.FALSE);
-        checkIndexRequest.humanReadable(Boolean.TRUE);
-        checkIndexRequest.includeDefaults(Boolean.FALSE);
-
-        checkIndexRequestLocal.set(checkIndexRequest);
-    }
 
     /**
      * initIndexSettingBuilder
@@ -97,36 +78,64 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient {
     }
 
     private GetIndexRequest getCheckIndexRequest(String index) {
-        GetIndexRequest getIndexRequest = checkIndexRequestLocal.get();
-        getIndexRequest.indices(index);
-        return getIndexRequest;
+        GetIndexRequest checkIndexRequest = new GetIndexRequest();
+
+        checkIndexRequest.indices(index);
+        checkIndexRequest.local(Boolean.FALSE);
+        checkIndexRequest.humanReadable(Boolean.TRUE);
+        checkIndexRequest.includeDefaults(Boolean.FALSE);
+
+        return checkIndexRequest;
     }
 
     /**
      * creatIndex
-     * @Description 同步创建索引
-     * @param index 索引
-     * @param mapping 索引mapping
+     *
+     * @param index   索引
+     * @param mapping 索引mapping
      * @return boolean
+     * @Description 同步创建索引
      * @Date 2018/10/11 4:43 PM
      */
-    public boolean creatIndex(String index, String type, String mapping) throws IOException {
-        if (indexExist(index)) {
+    public boolean creatIndex(String index, String type, Map<String, Object> mapping) throws IOException {
+        if (!indexExist(index)) {
             CreateIndexRequest createIndexRequest = new CreateIndexRequest();
 
             createIndexRequest.index(index);
             createIndexRequest.settings(settingBuilder);
-            createIndexRequest.mapping(type==null?index:type,mapping,XContentType.JSON);
+            createIndexRequest.mapping(type == null ? index : type, mapping);
 
             // 进行同步创建
             CreateIndexResponse createIndexResponse = indices().create(createIndexRequest, RequestOptions.DEFAULT);
 
-            return  createIndexResponse.isAcknowledged();
+            return createIndexResponse.isAcknowledged();
         }
         return false;
     }
 
-    public void creatIndexAsync(String index, String type,ActionListener<CreateIndexResponse> listener) {
+    /**
+     * creatIndexAsync
+     *
+     * @param index    索引
+     * @param type     类型
+     * @param mapping  字段
+     * @param listener 监听
+     * @return void
+     * @Description 异步创建索引
+     * @Date 2018/10/16 2:05 PM
+     */
+    public void creatIndexAsync(String index, String type, Map<String, Object> mapping,
+                                ActionListener<CreateIndexResponse>
+        listener) throws IOException {
+        if (!indexExist(index)) {
+            CreateIndexRequest createIndexRequest = new CreateIndexRequest();
 
+            createIndexRequest.index(index);
+            createIndexRequest.settings(settingBuilder);
+            createIndexRequest.mapping(type == null ? index : type, mapping);
+
+            // 进行同步创建
+            indices().createAsync(createIndexRequest, RequestOptions.DEFAULT, listener);
+        }
     }
 }
