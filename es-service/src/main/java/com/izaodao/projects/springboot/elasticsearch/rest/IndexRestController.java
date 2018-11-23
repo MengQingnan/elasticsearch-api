@@ -1,13 +1,10 @@
-package com.izaodao.projects.springboot.elasticsearch.controller;
+package com.izaodao.projects.springboot.elasticsearch.rest;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.izaodao.projects.springboot.elasticsearch.client.ZaodaoRestHighLevelClient;
+import com.izaodao.projects.springboot.elasticsearch.client.IZaodaoRestHighLevelClient;
 import com.izaodao.projects.springboot.elasticsearch.config.dictionary.JTypeMatchEsTypeEnum;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsIndexParamters;
-import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,11 +25,9 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = "rest/index/")
-@Slf4j
 public class IndexRestController {
     @Autowired
-    private ZaodaoRestHighLevelClient zaodaoRestHighLevelClient;
-
+    private IZaodaoRestHighLevelClient zaodaoRestHighLevelClient;
 
     @GetMapping(value = "creat", produces = "application/json")
     public void creatIndex(@RequestParam(value = "indexSetting") String indexSetting) throws IOException {
@@ -50,17 +45,7 @@ public class IndexRestController {
             EsIndexParamters esIndexParamters = arrangeEsIndexParams(indexTypeSetting, indexMapping);
 
             zaodaoRestHighLevelClient.creatIndexAsync(esIndexParamters.getIndex(), esIndexParamters.getType(),
-                esIndexParamters.getMappings(), new ActionListener<CreateIndexResponse>() {
-                    @Override
-                    public void onResponse(CreateIndexResponse createIndexResponse) {
-                        System.out.println(createIndexResponse.isAcknowledged());
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-                        log.error("async creat inedex exception", e);
-                    }
-                });
+                esIndexParamters.getMappings());
         }
     }
 

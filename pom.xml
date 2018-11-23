@@ -30,7 +30,7 @@
         <compiler.source>1.8</compiler.source>
         <compiler.target>1.8</compiler.target>
 
-        <elasticsearch>6.4.2</elasticsearch>
+        <elasticsearch>6.4.3</elasticsearch>
         <springdata.commons>2.1.0.RELEASE</springdata.commons>
     </properties>
 

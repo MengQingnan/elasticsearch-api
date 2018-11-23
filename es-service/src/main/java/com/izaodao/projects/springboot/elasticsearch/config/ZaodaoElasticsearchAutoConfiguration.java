@@ -1,9 +1,11 @@
 package com.izaodao.projects.springboot.elasticsearch.config;
 
-import com.izaodao.projects.springboot.elasticsearch.client.ZaodaoRestHighLevelClient;
+import com.izaodao.projects.springboot.elasticsearch.client.IZaodaoRestHighLevelClient;
+import com.izaodao.projects.springboot.elasticsearch.client.ZaodaoElasticsearcRestClientFactory;
+import com.izaodao.projects.springboot.elasticsearch.client.request.ElasticsearchRequestFactory;
+import com.izaodao.projects.springboot.elasticsearch.client.response.ElasticsearchClientResponseHandle;
 import com.izaodao.projects.springboot.elasticsearch.config.properties.ZaodaoElasticsearchIndexProperties;
 import com.izaodao.projects.springboot.elasticsearch.config.properties.ZaodaoElasticsearchProperties;
-import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.inject.Singleton;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -24,7 +26,6 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnClass({RestHighLevelClient.class})
 @ConditionalOnProperty(prefix = "spring.elasticsearch.rest.config", name = "cluster-nodes", matchIfMissing = false)
 @EnableConfigurationProperties({ZaodaoElasticsearchProperties.class, ZaodaoElasticsearchIndexProperties.class})
-@Slf4j
 public class ZaodaoElasticsearchAutoConfiguration {
 
     private final ZaodaoElasticsearchProperties properties;
@@ -41,14 +42,16 @@ public class ZaodaoElasticsearchAutoConfiguration {
     @Singleton
     @ConditionalOnMissingBean
     public ZaodaoElasticsearcRestClientFactory elasticsearcRestClientFactory() {
-        return ZaodaoElasticsearcRestClientFactory.createClientFactory(properties, indexProperties);
+        return ZaodaoElasticsearcRestClientFactory.createClientFactory(properties,
+            new ElasticsearchClientResponseHandle(),
+            new ElasticsearchRequestFactory(indexProperties));
     }
 
     @Bean
     @Singleton
     @ConditionalOnBean(ZaodaoElasticsearcRestClientFactory.class)
     @ConditionalOnMissingBean
-    public ZaodaoRestHighLevelClient getRestHighLevelClient(ZaodaoElasticsearcRestClientFactory zaodaoElasticsearcRestClientFactory){
+    public IZaodaoRestHighLevelClient getRestHighLevelClient(ZaodaoElasticsearcRestClientFactory zaodaoElasticsearcRestClientFactory){
         return zaodaoElasticsearcRestClientFactory.getRestHighLevelClient();
     }
 }

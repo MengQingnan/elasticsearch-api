@@ -1,14 +1,15 @@
-package com.izaodao.projects.springboot.elasticsearch.config;
+package com.izaodao.projects.springboot.elasticsearch.client;
 
-import com.izaodao.projects.springboot.elasticsearch.client.ZaodaoRestHighLevelClient;
-import com.izaodao.projects.springboot.elasticsearch.config.properties.ZaodaoElasticsearchIndexProperties;
+import com.izaodao.projects.springboot.elasticsearch.client.request.IElasticsearchRequestFactory;
+import com.izaodao.projects.springboot.elasticsearch.client.response.IElasticsearchClientResponseHandle;
 import com.izaodao.projects.springboot.elasticsearch.config.properties.ZaodaoElasticsearchProperties;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.Node;
 import org.elasticsearch.client.NodeSelector;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -19,16 +20,15 @@ import java.io.IOException;
  * @Date: 2018/10/8 3:50 PM
  * Copyright (c) 2018, zaodao All Rights Reserved.
  */
-@Slf4j
 public class ZaodaoElasticsearcRestClientFactory {
+    /**
+     * logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZaodaoElasticsearcRestClientFactory.class);
     /**
      * 初始化es config 配置文件
      */
     private ZaodaoElasticsearchProperties properties;
-    /**
-     * 初始化es index 配置文件
-     */
-    private ZaodaoElasticsearchIndexProperties indexProperties;
     /**
      * restHighLevelClient
      */
@@ -37,6 +37,14 @@ public class ZaodaoElasticsearcRestClientFactory {
      * restClientBuilder
      */
     private RestClientBuilder restClientBuilder;
+    /**
+     * elasticsearchClientResponseHandle
+     */
+    private IElasticsearchClientResponseHandle elasticsearchClientResponseHandle;
+    /**
+     * requestFactory
+     */
+    private IElasticsearchRequestFactory requestFactory;
 
     /**
      * 单例
@@ -44,9 +52,11 @@ public class ZaodaoElasticsearcRestClientFactory {
     private static ZaodaoElasticsearcRestClientFactory restClientFactory;
 
     private ZaodaoElasticsearcRestClientFactory(ZaodaoElasticsearchProperties properties,
-                                                ZaodaoElasticsearchIndexProperties indexProperties) {
+                                                IElasticsearchClientResponseHandle elasticsearchClientResponseHandle,
+                                                IElasticsearchRequestFactory requestFactory) {
         this.properties = properties;
-        this.indexProperties = indexProperties;
+        this.elasticsearchClientResponseHandle = elasticsearchClientResponseHandle;
+        this.requestFactory = requestFactory;
     }
 
     /**
@@ -89,7 +99,8 @@ public class ZaodaoElasticsearcRestClientFactory {
             });
         }
 
-        restHighLevelClient = new ZaodaoRestHighLevelClient(this.indexProperties, this.restClientBuilder);
+        restHighLevelClient = new ZaodaoRestHighLevelClient(this.restClientBuilder,
+            elasticsearchClientResponseHandle, requestFactory);
     }
 
     /**
@@ -100,7 +111,7 @@ public class ZaodaoElasticsearcRestClientFactory {
             try {
                 restHighLevelClient.close();
             } catch (IOException e) {
-                log.error("close restHighLevelClient exception", e);
+                LOGGER.error("close restHighLevelClient exception", e);
             }
         }
     }
@@ -132,9 +143,10 @@ public class ZaodaoElasticsearcRestClientFactory {
     }
 
     public static ZaodaoElasticsearcRestClientFactory createClientFactory(ZaodaoElasticsearchProperties properties,
-                                                                          ZaodaoElasticsearchIndexProperties indexProperties) {
+                                                                          IElasticsearchClientResponseHandle handle,
+                                                                          IElasticsearchRequestFactory requestFactory) {
         if (restClientFactory == null) {
-            restClientFactory = new ZaodaoElasticsearcRestClientFactory(properties, indexProperties);
+            restClientFactory = new ZaodaoElasticsearcRestClientFactory(properties, handle, requestFactory);
 
             return restClientFactory;
         }

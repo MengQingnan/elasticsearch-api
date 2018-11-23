@@ -1,17 +1,23 @@
 package com.izaodao.projects.springboot.elasticsearch.client;
 
-import com.izaodao.projects.springboot.elasticsearch.config.properties.ZaodaoElasticsearchIndexProperties;
-import lombok.extern.slf4j.Slf4j;
+import com.izaodao.projects.springboot.elasticsearch.client.request.IElasticsearchRequestFactory;
+import com.izaodao.projects.springboot.elasticsearch.client.response.IElasticsearchClientResponseHandle;
+import com.izaodao.projects.springboot.elasticsearch.client.response.ResponseActionListener;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.settings.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -19,40 +25,47 @@ import java.util.Map;
 
 /**
  * @Auther: Mengqingnan
- * @Description:
+ * @Description: RestHighLevelClient 进行包装
  * @Date: 2018/10/11 1:44 PM
  * Copyright (c) 2018, zaodao All Rights Reserved.
  */
-@Slf4j
-public class ZaodaoRestHighLevelClient extends RestHighLevelClient {
+public class ZaodaoRestHighLevelClient extends RestHighLevelClient implements IZaodaoRestHighLevelClient {
     /**
-     * 创建索引配置
+     * logger
      */
-    private Settings.Builder settingBuilder;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZaodaoRestHighLevelClient.class);
 
-    public ZaodaoRestHighLevelClient(ZaodaoElasticsearchIndexProperties elasticsearchIndexProperties,
-                                     RestClientBuilder restClientBuilder) {
+    /**
+     * request factory
+     */
+    private IElasticsearchRequestFactory requestFactory;
+
+    /**
+     * response handle
+     */
+    private IElasticsearchClientResponseHandle elasticsearchClientResponseHandle;
+
+    /**
+     * action response listener （just a single object）
+     */
+    private final ActionListener responseActionListener;
+
+    /**
+     * 同步、异步标识
+     */
+    private enum SyncEnum {
+        SYNC, ASYNC
+    }
+
+    ZaodaoRestHighLevelClient(RestClientBuilder restClientBuilder,
+                              IElasticsearchClientResponseHandle elasticsearchClientResponseHandle,
+                              IElasticsearchRequestFactory requestFactory) {
         super(restClientBuilder);
-
-        initIndexSettingBuilder(elasticsearchIndexProperties);
+        this.elasticsearchClientResponseHandle = elasticsearchClientResponseHandle;
+        this.requestFactory = requestFactory;
+        responseActionListener = new ResponseActionListener(elasticsearchClientResponseHandle);
     }
 
-
-    /**
-     * initIndexSettingBuilder
-     *
-     * @param elasticsearchIndexProperties 索引配置文件
-     * @Description 初始化 索引配置
-     * @Date 2018/10/11 2:25 PM
-     */
-    private void initIndexSettingBuilder(ZaodaoElasticsearchIndexProperties elasticsearchIndexProperties) {
-        settingBuilder = Settings.builder();
-
-        settingBuilder.put("index.refresh_interval", elasticsearchIndexProperties.getRefreshInterval());
-        settingBuilder.put("index.number_of_shards", elasticsearchIndexProperties.getNumberOfReplicas());
-        settingBuilder.put("index.number_of_replicas", elasticsearchIndexProperties.getNumberOfReplicas());
-        settingBuilder.put("index.store.type", elasticsearchIndexProperties.getStoreType());
-    }
 
     /**
      * 同步验证索引是否存在
@@ -62,33 +75,10 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient {
      * @throws IOException
      */
     public boolean indexExist(String index) throws IOException {
-        return indices().exists(getCheckIndexRequest(index), RequestOptions.DEFAULT);
-    }
+        GetIndexRequest getIndexRequest = requestFactory.obtainRequest(GetIndexRequest.class);
+        getIndexRequest.indices(index);
 
-    /**
-     * 异步验证索引是否存在
-     *
-     * @param index    索引
-     * @param listener 回调函数
-     * @throws IOException
-     */
-    public void indexExistAsync(String index, ActionListener<Boolean> listener) {
-        if (listener == null) {
-            throw new NullPointerException(" Async listener must exist ");
-        }
-
-        indices().existsAsync(getCheckIndexRequest(index), RequestOptions.DEFAULT, listener);
-    }
-
-    private GetIndexRequest getCheckIndexRequest(String index) {
-        GetIndexRequest checkIndexRequest = new GetIndexRequest();
-
-        checkIndexRequest.indices(index);
-        checkIndexRequest.local(Boolean.FALSE);
-        checkIndexRequest.humanReadable(Boolean.TRUE);
-        checkIndexRequest.includeDefaults(Boolean.FALSE);
-
-        return checkIndexRequest;
+        return indices().exists(getIndexRequest, RequestOptions.DEFAULT);
     }
 
     /**
@@ -102,14 +92,15 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient {
      */
     public boolean creatIndex(String index, String type, Map<String, Object> mapping) throws IOException {
         if (!indexExist(index)) {
-            CreateIndexRequest createIndexRequest = new CreateIndexRequest();
+            CreateIndexRequest createIndexRequest = requestFactory.obtainRequest(CreateIndexRequest.class);
 
             createIndexRequest.index(index);
-            createIndexRequest.settings(settingBuilder);
             createIndexRequest.mapping(type == null ? index : type, mapping);
 
             // 进行同步创建
             CreateIndexResponse createIndexResponse = indices().create(createIndexRequest, RequestOptions.DEFAULT);
+            // 异步处理请求结果
+            elasticsearchClientResponseHandle.asyncHandleResponse(createIndexResponse);
 
             return createIndexResponse.isAcknowledged();
         }
@@ -119,71 +110,124 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient {
     /**
      * creatIndexAsync
      *
-     * @param index    索引
-     * @param type     类型
-     * @param mapping  字段
-     * @param listener 监听
+     * @param index   索引
+     * @param type    类型
+     * @param mapping 字段
      * @return void
      * @Description 异步创建索引
      * @Date 2018/10/16 2:05 PM
      */
-    public void creatIndexAsync(String index, String type, Map<String, Object> mapping,
-                                ActionListener<CreateIndexResponse>
-                                    listener) throws IOException {
+    public void creatIndexAsync(String index, String type, Map<String, Object> mapping) throws IOException {
         if (!indexExist(index)) {
-            CreateIndexRequest createIndexRequest = new CreateIndexRequest();
+            CreateIndexRequest createIndexRequest = requestFactory.obtainRequest(CreateIndexRequest.class);
 
             createIndexRequest.index(index);
-            createIndexRequest.settings(settingBuilder);
             createIndexRequest.mapping(type == null ? index : type, mapping);
 
             // 进行同步创建
-            indices().createAsync(createIndexRequest, RequestOptions.DEFAULT, listener);
+            indices().createAsync(createIndexRequest, RequestOptions.DEFAULT, responseActionListener);
         }
     }
 
     /**
-     * index
+     * indexSync
      *
      * @param index  索引
      * @param type   类型
      * @param id     id
      * @param params 参数内容
      * @return org.elasticsearch.action.index.IndexResponse
-     * @Description 通过Map构建索引
+     * @Description 通过Map同步构建索引
      * @Date 2018/11/8 7:46 PM
      */
-    public IndexResponse index(String index, String type, String id, Map<String, Object> params) {
-        return indexCommon(index, type, id, params);
+    public IndexResponse indexSync(String index, String type, String id, Map<String, Object> params) {
+        return indexCommon(index, type, id, params, SyncEnum.SYNC);
     }
 
     /**
-     * index
+     * indexSync
      *
      * @param index      索引
      * @param type       类型
      * @param id         id
      * @param jsonParams 参数内容
      * @return org.elasticsearch.action.index.IndexResponse
-     * @Description 通过Map构建索引
+     * @Description 通过json String同步构建索引
      * @Date 2018/11/8 7:46 PM
      */
-    public IndexResponse index(String index, String type, String id, String jsonParams) {
-        return indexCommon(index, type, id, jsonParams);
+    public IndexResponse indexSync(String index, String type, String id, String jsonParams) {
+        return indexCommon(index, type, id, jsonParams, SyncEnum.SYNC);
     }
 
-    private IndexResponse indexCommon(String index, String type, String id, Object params) {
-        if (StringUtils.isEmpty(index)) {
-            throw new NullPointerException(" INDEX IS EMPTY ");
-        }
+    /**
+     * indexAsync
+     *
+     * @param index  索引
+     * @param type   类型
+     * @param id     id
+     * @param params 参数内容
+     * @return void
+     * @Description 通过Map 异步构建索引
+     * @Date 2018/11/9 5:00 PM
+     */
+    public void indexAsync(String index, String type, String id, Map<String, Object> params) {
+        indexCommon(index, type, id, params, SyncEnum.ASYNC);
+    }
 
-        IndexRequest indexRequest;
+    /**
+     * indexAsync
+     *
+     * @param index      索引
+     * @param type       类型
+     * @param id         id
+     * @param jsonParams 参数内容
+     * @return void
+     * @Description 通过json String 异步构建索引
+     * @Date 2018/11/9 5:00 PM
+     */
+    public void indexAsync(String index, String type, String id, String jsonParams) {
+        indexCommon(index, type, id, jsonParams, SyncEnum.ASYNC);
+    }
 
-        if (StringUtils.isEmpty(id)) {
-            indexRequest = new IndexRequest(index, StringUtils.isEmpty(type) ? index : type);
-        } else {
-            indexRequest = new IndexRequest(index, StringUtils.isEmpty(type) ? index : type, id);
-        }
+    @Override
+    public UpdateResponse updateSync(String index, String type, String id, Map<String, Object> params) {
+        return updateCommon(index, type, id, params, SyncEnum.SYNC);
+    }
+
+    @Override
+    public UpdateResponse updateSync(String index, String type, String id, String jsonParams) {
+        return updateCommon(index, type, id, jsonParams, SyncEnum.SYNC);
+    }
+
+    @Override
+    public void updateAsync(String index, String type, String id, Map<String, Object> params) {
+        updateCommon(index, type, id, params, SyncEnum.ASYNC);
+    }
+
+    @Override
+    public void updateAsync(String index, String type, String id, String jsonParams) {
+        updateCommon(index, type, id, jsonParams, SyncEnum.ASYNC);
+    }
+
+    @Override
+    public DeleteResponse deleteSync(String index, String type, String id) {
+        return deleteCommon(index, type, id, SyncEnum.SYNC);
+    }
+
+    @Override
+    public void deleteAsync(String index, String type, String id) {
+        deleteCommon(index, type, id, SyncEnum.ASYNC);
+    }
+
+    private IndexResponse indexCommon(String index, String type, String id, Object params, SyncEnum syncEnum) {
+        IndexRequest indexRequest = requestFactory.obtainRequest(IndexRequest.class);
+
+        // set index
+        indexRequest.index(index);
+        // set type
+        indexRequest.type(StringUtils.isEmpty(type) ? index : type);
+        // set id
+        indexRequest.id(id);
 
         if (params instanceof Map) {
             indexRequest.source((Map) params);
@@ -191,13 +235,83 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient {
             indexRequest.source((String) params);
         }
 
-        IndexResponse indexResponse = null;
-        try {
-            indexResponse = index(indexRequest, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            log.error(" index data exception", e);
+        if (syncEnum == SyncEnum.SYNC) {
+            IndexResponse indexResponse = null;
+            try {
+                indexResponse = index(indexRequest, RequestOptions.DEFAULT);
+
+                elasticsearchClientResponseHandle.asyncHandleResponse(indexResponse);
+            } catch (IOException e) {
+                LOGGER.error(" index data exception", e);
+            }
+
+            return indexResponse;
+        } else {
+            indexAsync(indexRequest, RequestOptions.DEFAULT, responseActionListener);
+
+            return null;
+        }
+    }
+
+    private DeleteResponse deleteCommon(String index, String type, String id, SyncEnum syncEnum) {
+        DeleteRequest deleteRequest = requestFactory.obtainRequest(DeleteRequest.class);
+
+        // set index
+        deleteRequest.index(index);
+        // set type
+        deleteRequest.type(StringUtils.isEmpty(type) ? index : type);
+        // set id
+        deleteRequest.id(id);
+
+        if (syncEnum == SyncEnum.SYNC) {
+            DeleteResponse deleteResponse = null;
+            try {
+                deleteResponse = delete(deleteRequest, RequestOptions.DEFAULT);
+
+                elasticsearchClientResponseHandle.asyncHandleResponse(deleteResponse);
+            } catch (IOException e) {
+                LOGGER.error(" delete data exception", e);
+            }
+
+            return deleteResponse;
+        } else {
+            deleteAsync(deleteRequest, RequestOptions.DEFAULT, responseActionListener);
+
+            return null;
+        }
+    }
+
+    private UpdateResponse updateCommon(String index, String type, String id, Object params, SyncEnum syncEnum) {
+        UpdateRequest updateRequest = requestFactory.obtainRequest(UpdateRequest.class);
+
+        // set index
+        updateRequest.index(index);
+        // set type
+        updateRequest.type(StringUtils.isEmpty(type) ? index : type);
+        // set id
+        updateRequest.id(id);
+
+        if (params instanceof Map) {
+            updateRequest.doc((Map) params);
+        } else if (params instanceof String) {
+            updateRequest.doc((String) params);
         }
 
-        return indexResponse;
+        if (syncEnum == SyncEnum.SYNC) {
+            UpdateResponse updateResponse = null;
+            try {
+                updateResponse = update(updateRequest, RequestOptions.DEFAULT);
+
+                elasticsearchClientResponseHandle.asyncHandleResponse(updateResponse);
+            } catch (IOException e) {
+                LOGGER.error(" update data exception", e);
+            }
+
+            return updateResponse;
+        } else {
+            updateAsync(updateRequest, RequestOptions.DEFAULT, responseActionListener);
+
+            return null;
+        }
     }
 }

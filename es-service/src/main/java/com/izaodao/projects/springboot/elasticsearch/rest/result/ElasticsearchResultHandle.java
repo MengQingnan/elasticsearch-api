@@ -1,4 +1,4 @@
-package com.izaodao.projects.springboot.elasticsearch.service;
+package com.izaodao.projects.springboot.elasticsearch.rest.result;
 
 import com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult;
 import org.elasticsearch.action.index.IndexResponse;
@@ -11,7 +11,7 @@ import org.elasticsearch.action.index.IndexResponse;
  */
 public class ElasticsearchResultHandle {
 
-    protected EsOperResult handleResult(IndexResponse indexResponse) {
+    protected EsOperResult handleSyncResult(IndexResponse indexResponse) {
         EsOperResult esOperResult = new EsOperResult();
 
         if (indexResponse == null) {
@@ -23,5 +23,9 @@ public class ElasticsearchResultHandle {
         esOperResult.setReesult(indexResponse.getResult().getLowercase());
 
         return esOperResult;
+    }
+
+    protected EsOperResult handleAsyncResult() {
+        return new EsOperResult();
     }
 }

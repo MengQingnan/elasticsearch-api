@@ -16,7 +16,7 @@ public final class EsOperResult extends EsBase implements Serializable {
     /**
      * 操作状态
      */
-    private Boolean operFlag = Boolean.TRUE;
+    private Boolean operFlag = Boolean.FALSE;
     /**
      * 操作结果
      */

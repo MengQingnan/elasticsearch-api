@@ -130,7 +130,7 @@ public class IndexAnnotationHandler {
         //locationPattern.append(basePackagePath.substring(basePackagePath.indexOf("com/")));
         locationPattern.append("com/izaodao/projects/springboot/");
         locationPattern.append(StringUtils.isEmpty(serviceName)?"**":serviceName);
-        locationPattern.append("/**/domain/*.class");
+        locationPattern.append("/**/elasticsearch/*.class");
 
         return locationPattern.toString();
     }
