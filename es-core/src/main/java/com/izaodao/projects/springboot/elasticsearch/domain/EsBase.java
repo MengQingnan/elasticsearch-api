@@ -9,6 +9,9 @@ import java.io.Serializable;
  * Copyright (c) 2018, zaodao All Rights Reserved.
  */
 public class EsBase implements Serializable {
+    /**
+     * 序列化
+     */
     private static final long serialVersionUID = 6044097335623567087L;
     /**
      *  索引

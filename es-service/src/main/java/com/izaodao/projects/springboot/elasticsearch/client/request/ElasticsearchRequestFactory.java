@@ -1,6 +1,7 @@
 package com.izaodao.projects.springboot.elasticsearch.client.request;
 
 import com.izaodao.projects.springboot.elasticsearch.config.properties.ZaodaoElasticsearchIndexProperties;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkBase;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -8,11 +9,14 @@ import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.MultiGetRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @Auther: Mengqingnan
@@ -38,12 +42,22 @@ public class ElasticsearchRequestFactory extends ElasticsearchRequestConfig impl
 
     @Override
     public <T extends ActionRequest> T obtainRequest(Class<? extends ActionRequest> clazz) {
+        return obtainRequest(clazz, null);
+    }
+
+    @Override
+    public <T extends ActionRequest> T obtainRequest(Class<? extends ActionRequest> clazz,
+                                                     List<? extends EsMultiBulkBase> multiBulkBases) {
         try {
-            ActionRequest actionRequest =  clazz.newInstance();
+            ActionRequest actionRequest = clazz.newInstance();
 
-            this.configActionRequest(actionRequest);
+            if (multiBulkBases == null) {
+                this.configActionRequest(actionRequest);
+            } else {
+                this.configActionRequest(actionRequest, multiBulkBases);
+            }
 
-            return (T)actionRequest;
+            return (T) actionRequest;
         } catch (InstantiationException e) {
             LOGGER.error("InstantiationException", e);
         } catch (IllegalAccessException e) {
@@ -57,7 +71,7 @@ public class ElasticsearchRequestFactory extends ElasticsearchRequestConfig impl
     private ActionRequest handRequest(RequestEnum requestEnum) {
         ActionRequest actionRequest;
 
-        switch (requestEnum){
+        switch (requestEnum) {
             case CreateIndex:
                 actionRequest = new CreateIndexRequest();
                 break;
@@ -84,6 +98,9 @@ public class ElasticsearchRequestFactory extends ElasticsearchRequestConfig impl
                 break;
             case SearchDocument:
                 actionRequest = new SearchRequest();
+                break;
+            case MultiGetDocument:
+                actionRequest = new MultiGetRequest();
                 break;
             default:
                 actionRequest = null;

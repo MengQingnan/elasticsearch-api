@@ -8,5 +8,5 @@ package com.izaodao.projects.springboot.elasticsearch.client.request;
  */
 public enum RequestEnum {
     GetIndex, CreateIndex, DeleteIndex, IndexDocument, GetDocument, DeleteDocument, UpdateDocument, BlukDocument,
-    SearchDocument;
+    SearchDocument,MultiGetDocument
 }

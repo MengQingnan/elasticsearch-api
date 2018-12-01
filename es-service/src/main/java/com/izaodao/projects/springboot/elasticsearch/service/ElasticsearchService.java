@@ -3,18 +3,21 @@ package com.izaodao.projects.springboot.elasticsearch.service;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSON;
 import com.izaodao.projects.springboot.elasticsearch.client.IZaodaoRestHighLevelClient;
-import com.izaodao.projects.springboot.elasticsearch.domain.EsOperParamters;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsBulkOperParamters;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkBase;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkOperResult;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult;
 import com.izaodao.projects.springboot.elasticsearch.interfaces.IElasticsearchService;
-import com.izaodao.projects.springboot.elasticsearch.rest.result.ElasticsearchResultHandle;
+import com.izaodao.projects.springboot.elasticsearch.service.result.ElasticsearchResultHandle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * @Auther: Mengqingnan
- * @Description:
+ * @Description: ElasticsearchService
  * @Date: 2018/9/29 下午4:06
  * Copyright (c) 2018, zaodao All Rights Reserved.
  */
@@ -25,9 +28,32 @@ public class ElasticsearchService extends ElasticsearchResultHandle implements I
     @Autowired
     private IZaodaoRestHighLevelClient zaodaoRestHighLevelClient;
 
+
+
     @Override
-    public String getInfoById(String id, EsOperParamters esOperParamters) {
-        return null;
+    public EsOperResult queryById(String index, String type, String id) {
+        return handleSyncResult(zaodaoRestHighLevelClient.queryById(index, type, id));
+    }
+
+    @Override
+    public EsOperResult queryById(String index, String type, String id, String[] includeFields) {
+        return handleSyncResult(zaodaoRestHighLevelClient.queryById(index, type, id, includeFields));
+    }
+
+    @Override
+    public EsMultiBulkOperResult multiQuery(List<EsMultiBulkBase> multiBulkBases) {
+        return handleMultBulkSyncResult(zaodaoRestHighLevelClient.multiQuery(multiBulkBases));
+    }
+
+    @Override
+    public EsMultiBulkOperResult bulkSync(List<EsBulkOperParamters> bulkOperParamters) {
+        return handleMultBulkSyncResult(zaodaoRestHighLevelClient.bulkSync(bulkOperParamters));
+    }
+
+    @Override
+    public EsOperResult bulkAsync(List<EsBulkOperParamters> bulkOperParamters) {
+        zaodaoRestHighLevelClient.bulkAsync(bulkOperParamters);
+        return handleAsyncResult();
     }
 
     @Override
@@ -42,6 +68,32 @@ public class ElasticsearchService extends ElasticsearchResultHandle implements I
         Map<String, Object> params = JSON.parseObject(paramJson, Map.class);
 
         return handleSyncResult(zaodaoRestHighLevelClient.indexSync(index, type, id, params));
+    }
+
+    @Override
+    public EsOperResult updateSync(String index, String type, String id, String paramJson) {
+        Map<String, Object> params = JSON.parseObject(paramJson, Map.class);
+
+        return handleSyncResult(zaodaoRestHighLevelClient.updateSync(index, type, id, params));
+    }
+
+    @Override
+    public EsOperResult updateAsync(String index, String type, String id, String paramJson) {
+        Map<String, Object> params = JSON.parseObject(paramJson, Map.class);
+
+        zaodaoRestHighLevelClient.updateAsync(index, type, id, params);
+        return handleAsyncResult();
+    }
+
+    @Override
+    public EsOperResult deleteSync(String index, String type, String id) {
+        return handleSyncResult(zaodaoRestHighLevelClient.deleteSync(index, type, id));
+    }
+
+    @Override
+    public EsOperResult deleteAsync(String index, String type, String id) {
+        zaodaoRestHighLevelClient.deleteAsync(index, type, id);
+        return handleAsyncResult();
     }
 
 }

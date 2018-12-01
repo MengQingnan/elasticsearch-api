@@ -3,12 +3,19 @@ package com.izaodao.projects.springboot.elasticsearch.client;
 import com.izaodao.projects.springboot.elasticsearch.client.request.IElasticsearchRequestFactory;
 import com.izaodao.projects.springboot.elasticsearch.client.response.IElasticsearchClientResponseHandle;
 import com.izaodao.projects.springboot.elasticsearch.client.response.ResponseActionListener;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsBulkOperParamters;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkBase;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.get.MultiGetRequest;
+import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateRequest;
@@ -16,11 +23,14 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.Strings;
+import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -128,6 +138,67 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient implements IZ
             indices().createAsync(createIndexRequest, RequestOptions.DEFAULT, responseActionListener);
         }
     }
+
+    @Override
+    public GetResponse queryById(String index, String type, String id) {
+        return queryById(index, type, id, new String[0]);
+    }
+
+    @Override
+    public GetResponse queryById(String index, String type, String id, String[] includeFields) {
+        GetRequest getRequest = requestFactory.obtainRequest(GetRequest.class);
+
+        getRequest.index(index);
+        getRequest.type(type);
+        getRequest.id(id);
+
+        if (includeFields.length > 0) {
+            FetchSourceContext fetchSourceContext =
+                new FetchSourceContext(true, includeFields, Strings.EMPTY_ARRAY);
+
+            getRequest.fetchSourceContext(fetchSourceContext);
+        }
+
+        GetResponse getResponse = null;
+
+        try {
+            getResponse = get(getRequest, RequestOptions.DEFAULT);
+
+            elasticsearchClientResponseHandle.asyncHandleResponse(getResponse);
+        } catch (IOException e) {
+            LOGGER.error(" delete data exception", e);
+        }
+
+        return getResponse;
+    }
+
+    @Override
+    public MultiGetResponse multiQuery(List<EsMultiBulkBase> multiBulkBases) {
+        MultiGetRequest multiGetRequest = requestFactory.obtainRequest(MultiGetRequest.class, multiBulkBases);
+
+        MultiGetResponse multiGetItemResponses = null;
+
+        try {
+            multiGetItemResponses =  mget(multiGetRequest, RequestOptions.DEFAULT);
+
+            elasticsearchClientResponseHandle.asyncHandleResponse(multiGetItemResponses);
+
+        } catch (IOException e) {
+            LOGGER.error(" multQuery data exception", e);
+        }
+
+        return multiGetItemResponses;
+    }
+
+    @Override
+    public BulkResponse bulkSync(List<EsBulkOperParamters> bulkOperParamters) {
+        return null;
+    }
+
+    @Override
+    public void bulkAsync(List<EsBulkOperParamters> bulkOperParamters) {
+    }
+
 
     /**
      * indexSync
