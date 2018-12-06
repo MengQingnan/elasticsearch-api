@@ -3,8 +3,12 @@ package com.izaodao.projects.springboot.elasticsearch.client.response;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
+import org.elasticsearch.action.bulk.BulkItemResponse;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.get.MultiGetItemResponse;
+import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.slf4j.Logger;
@@ -27,7 +31,7 @@ public final class ElasticsearchClientResponseHandle implements IElasticsearchCl
      */
     private ExecutorService responseHandleThreadPool = Executors.newFixedThreadPool(10);
 
-    public  void handleResponse(ActionResponse response) {
+    public void handleResponse(ActionResponse response) {
         if (response instanceof CreateIndexResponse) {
             handleResponse((CreateIndexResponse) response);
         } else if (response instanceof IndexResponse) {
@@ -38,6 +42,10 @@ public final class ElasticsearchClientResponseHandle implements IElasticsearchCl
             handleResponse((UpdateResponse) response);
         } else if (response instanceof DeleteResponse) {
             handleResponse((DeleteResponse) response);
+        } else if (response instanceof MultiGetResponse) {
+            handleResponse((MultiGetResponse) response);
+        } else if (response instanceof BulkResponse) {
+            handleResponse((BulkResponse) response);
         }
     }
 
@@ -54,22 +62,38 @@ public final class ElasticsearchClientResponseHandle implements IElasticsearchCl
     }
 
     private void handleResponse(CreateIndexResponse createIndexResponse) {
-        LOGGER.debug("result:"+createIndexResponse.isAcknowledged());
+        LOGGER.debug("result:" + createIndexResponse.isAcknowledged());
     }
 
     private void handleResponse(IndexResponse indexResponse) {
-        LOGGER.debug("result:"+indexResponse.getResult());
+        LOGGER.debug("result:" + indexResponse.getResult());
     }
 
     private void handleResponse(GetResponse getResponse) {
-        LOGGER.debug("result:"+getResponse.getSourceAsString());
+        LOGGER.debug("result:" + getResponse.getSourceAsString());
     }
 
     private void handleResponse(UpdateResponse updateResponse) {
-        LOGGER.debug("result:"+updateResponse.getResult());
+        LOGGER.debug("result:" + updateResponse.getResult());
     }
 
     private void handleResponse(DeleteResponse deleteResponse) {
-        LOGGER.debug("result:"+deleteResponse.getResult());
+        LOGGER.debug("result:" + deleteResponse.getResult());
+    }
+
+    private void handleResponse(MultiGetResponse multiGetItemResponses) {
+        MultiGetItemResponse[] getItemResponses = multiGetItemResponses.getResponses();
+        for (MultiGetItemResponse multiGetItemResponse : getItemResponses) {
+            LOGGER.debug("result:" + multiGetItemResponse.getResponse().getSourceAsString());
+        }
+
+    }
+
+    private void handleResponse(BulkResponse bulkItemResponse) {
+        BulkItemResponse[] bulkItemResponses = bulkItemResponse.getItems();
+
+        for (BulkItemResponse bulkResponse : bulkItemResponses) {
+            LOGGER.debug("result:" + bulkResponse.getResponse().getResult());
+        }
     }
 }

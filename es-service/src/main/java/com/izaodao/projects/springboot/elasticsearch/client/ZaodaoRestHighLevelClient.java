@@ -9,6 +9,7 @@ import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -179,7 +180,7 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient implements IZ
         MultiGetResponse multiGetItemResponses = null;
 
         try {
-            multiGetItemResponses =  mget(multiGetRequest, RequestOptions.DEFAULT);
+            multiGetItemResponses = mget(multiGetRequest, RequestOptions.DEFAULT);
 
             elasticsearchClientResponseHandle.asyncHandleResponse(multiGetItemResponses);
 
@@ -192,11 +193,26 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient implements IZ
 
     @Override
     public BulkResponse bulkSync(List<EsBulkOperParamters> bulkOperParamters) {
-        return null;
+        BulkRequest bulkRequest = requestFactory.obtainRequest(BulkRequest.class, bulkOperParamters);
+
+        BulkResponse bulkResponse = null;
+
+        try {
+            bulkResponse = bulk(bulkRequest, RequestOptions.DEFAULT);
+
+            elasticsearchClientResponseHandle.asyncHandleResponse(bulkResponse);
+        } catch (IOException e) {
+            LOGGER.error(" bulk data exception", e);
+        }
+
+        return bulkResponse;
     }
 
     @Override
     public void bulkAsync(List<EsBulkOperParamters> bulkOperParamters) {
+        BulkRequest bulkRequest = requestFactory.obtainRequest(BulkRequest.class, bulkOperParamters);
+
+        bulkAsync(bulkRequest, RequestOptions.DEFAULT, responseActionListener);
     }
 
 

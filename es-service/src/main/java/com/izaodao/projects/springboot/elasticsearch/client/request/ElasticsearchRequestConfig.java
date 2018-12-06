@@ -1,6 +1,8 @@
 package com.izaodao.projects.springboot.elasticsearch.client.request;
 
+import com.alibaba.fastjson.JSON;
 import com.izaodao.projects.springboot.elasticsearch.config.properties.ZaodaoElasticsearchIndexProperties;
+import com.izaodao.projects.springboot.elasticsearch.directory.OperTypeEnum;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsBulkOperParamters;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkBase;
 import org.elasticsearch.action.ActionRequest;
@@ -24,6 +26,7 @@ import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Auther: Mengqingnan
@@ -103,10 +106,6 @@ public class ElasticsearchRequestConfig {
 
     }
 
-    private void configRequest(BulkRequest bulkRequest, List<EsBulkOperParamters> bulkOperParamters) {
-
-    }
-
     private void configRequest(IndexRequest indexRequest) {
         // Timeout is setted to two seconds that wait for primary shard become available as a TimeValue
         indexRequest.timeout(TimeValue.timeValueSeconds(2));
@@ -167,7 +166,7 @@ public class ElasticsearchRequestConfig {
                 item.fetchSourceContext(FetchSourceContext.FETCH_SOURCE);
             } else {
                 item.fetchSourceContext(new FetchSourceContext(true,
-                    (String[])multiOperParamter.getIncludeFields().toArray(), Strings.EMPTY_ARRAY));
+                    (String[]) multiOperParamter.getIncludeFields().toArray(), Strings.EMPTY_ARRAY));
             }
 
             multiGetRequest.add(item.fetchSourceContext(FetchSourceContext.FETCH_SOURCE));
@@ -178,5 +177,31 @@ public class ElasticsearchRequestConfig {
         // getRequest.routing() ->  use it on specific condition
         // getRequest.version(2); -> use it on specific condition
         // getRequest.versionType(VersionType.EXTERNAL)
+    }
+
+    private void configRequest(BulkRequest bulkRequest, List<EsBulkOperParamters> bulkOperParamters) {
+        bulkRequest.timeout(TimeValue.timeValueSeconds(2));
+        bulkRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL);
+        bulkRequest.waitForActiveShards(ActiveShardCount.DEFAULT);
+
+        for (EsBulkOperParamters esBulkOperParamters : bulkOperParamters) {
+            if (esBulkOperParamters.getOperType() == OperTypeEnum.INDEX) {
+                IndexRequest indexRequest = new IndexRequest(esBulkOperParamters.getIndex(),
+                    esBulkOperParamters.getType(), esBulkOperParamters.getId());
+                indexRequest.source(JSON.parseObject(esBulkOperParamters.getParamJson(), Map.class));
+
+                bulkRequest.add(indexRequest);
+            } else if (esBulkOperParamters.getOperType() == OperTypeEnum.UPDATE) {
+                UpdateRequest updateRequest = new UpdateRequest(esBulkOperParamters.getIndex(),
+                    esBulkOperParamters.getType(), esBulkOperParamters.getId());
+                updateRequest.doc(JSON.parseObject(esBulkOperParamters.getParamJson(), Map.class));
+
+                bulkRequest.add(updateRequest);
+            } else if (esBulkOperParamters.getOperType() == OperTypeEnum.DELETE) {
+                DeleteRequest deleteRequest = new DeleteRequest(esBulkOperParamters.getIndex(),
+                    esBulkOperParamters.getType(), esBulkOperParamters.getId());
+                bulkRequest.add(deleteRequest);
+            }
+        }
     }
 }
