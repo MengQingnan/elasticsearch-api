@@ -108,7 +108,7 @@ public class IndexAnnotationHandler {
         StringBuilder stringBuilder = new StringBuilder();
 
         if (profileEnum == ProfileEnum.DEV) {
-            stringBuilder.append("http://localhost:8082");
+            stringBuilder.append("http://learn.izaodao.com:8082");
         } else if (profileEnum == ProfileEnum.TEST){
             stringBuilder.append("http://test.elasticsearch.com");
         } else {

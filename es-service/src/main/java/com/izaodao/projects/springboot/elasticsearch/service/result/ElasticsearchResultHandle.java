@@ -165,6 +165,8 @@ public class ElasticsearchResultHandle {
 
                 esOperResultList.add(esOperResult);
             }
+
+            esMultiBulkOperResult.setEsOperResults(esOperResultList);
         }
         return esMultiBulkOperResult;
     }
