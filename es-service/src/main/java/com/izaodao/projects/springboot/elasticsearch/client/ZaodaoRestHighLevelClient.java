@@ -4,7 +4,7 @@ import com.izaodao.projects.springboot.elasticsearch.client.request.IElasticsear
 import com.izaodao.projects.springboot.elasticsearch.client.response.IElasticsearchClientResponseHandle;
 import com.izaodao.projects.springboot.elasticsearch.client.response.ResponseActionListener;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsBulkOperParamters;
-import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkBase;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiOperParamters;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -174,8 +174,8 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient implements IZ
     }
 
     @Override
-    public MultiGetResponse multiQuery(List<EsMultiBulkBase> multiBulkBases) {
-        MultiGetRequest multiGetRequest = requestFactory.obtainRequest(MultiGetRequest.class, multiBulkBases);
+    public MultiGetResponse multiQuery(List<EsMultiOperParamters> multiOperParamters) {
+        MultiGetRequest multiGetRequest = requestFactory.obtainRequest(MultiGetRequest.class, multiOperParamters);
 
         MultiGetResponse multiGetItemResponses = null;
 

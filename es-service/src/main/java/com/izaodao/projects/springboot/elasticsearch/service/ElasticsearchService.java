@@ -4,8 +4,8 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSON;
 import com.izaodao.projects.springboot.elasticsearch.client.IZaodaoRestHighLevelClient;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsBulkOperParamters;
-import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkBase;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkOperResult;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiOperParamters;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult;
 import com.izaodao.projects.springboot.elasticsearch.interfaces.IElasticsearchService;
 import com.izaodao.projects.springboot.elasticsearch.service.result.ElasticsearchResultHandle;
@@ -29,7 +29,6 @@ public class ElasticsearchService extends ElasticsearchResultHandle implements I
     private IZaodaoRestHighLevelClient zaodaoRestHighLevelClient;
 
 
-
     @Override
     public EsOperResult queryById(String index, String type, String id) {
         return handleSyncResult(zaodaoRestHighLevelClient.queryById(index, type, id));
@@ -41,8 +40,8 @@ public class ElasticsearchService extends ElasticsearchResultHandle implements I
     }
 
     @Override
-    public EsMultiBulkOperResult multiQuery(List<EsMultiBulkBase> multiBulkBases) {
-        return handleMultBulkSyncResult(zaodaoRestHighLevelClient.multiQuery(multiBulkBases));
+    public EsMultiBulkOperResult multiQuery(List<EsMultiOperParamters> esMultiOperParamters) {
+        return handleMultBulkSyncResult(zaodaoRestHighLevelClient.multiQuery(esMultiOperParamters));
     }
 
     @Override

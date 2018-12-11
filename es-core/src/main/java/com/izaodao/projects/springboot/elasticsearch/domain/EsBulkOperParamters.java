@@ -17,9 +17,9 @@ public class EsBulkOperParamters extends EsMultiBulkBase implements Serializable
     private static final long serialVersionUID = -4273808679712391783L;
 
     /**
-     * 操作类型(默认类型为get)
+     * 操作类型（bulk 操作 包括 index 、 update 、 delete）
      */
-    private OperTypeEnum operType = OperTypeEnum.GET;
+    private OperTypeEnum operType;
 
     /**
      * 请求参数

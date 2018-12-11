@@ -5,6 +5,7 @@ import com.izaodao.projects.springboot.elasticsearch.config.properties.ZaodaoEla
 import com.izaodao.projects.springboot.elasticsearch.directory.OperTypeEnum;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsBulkOperParamters;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkBase;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiOperParamters;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -77,7 +78,7 @@ public class ElasticsearchRequestConfig {
         } else if (actionRequest instanceof SearchRequest) {
             configRequest((SearchRequest) actionRequest);
         } else if (actionRequest instanceof MultiGetRequest) {
-            configRequest((MultiGetRequest) actionRequest, (List<EsMultiBulkBase>) multiBulkBases);
+            configRequest((MultiGetRequest) actionRequest, (List<EsMultiOperParamters>) multiBulkBases);
         }
     }
 
@@ -152,13 +153,13 @@ public class ElasticsearchRequestConfig {
         // getRequest.versionType(VersionType.EXTERNAL)
     }
 
-    private void configRequest(MultiGetRequest multiGetRequest, List<EsMultiBulkBase> multiOperParamters) {
+    private void configRequest(MultiGetRequest multiGetRequest, List<EsMultiOperParamters> multiOperParamters) {
         multiGetRequest.realtime(true);
         multiGetRequest.refresh(false);
 
         MultiGetRequest.Item item;
 
-        for (EsMultiBulkBase multiOperParamter : multiOperParamters) {
+        for (EsMultiOperParamters multiOperParamter : multiOperParamters) {
             item = new MultiGetRequest.Item(multiOperParamter.getIndex(),
                 multiOperParamter.getType(), multiOperParamter.getId());
 

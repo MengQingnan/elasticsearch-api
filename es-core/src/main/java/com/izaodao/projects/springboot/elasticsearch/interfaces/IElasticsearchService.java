@@ -1,8 +1,8 @@
 package com.izaodao.projects.springboot.elasticsearch.interfaces;
 
 import com.izaodao.projects.springboot.elasticsearch.domain.EsBulkOperParamters;
-import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkBase;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkOperResult;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiOperParamters;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult;
 
 import java.util.List;
@@ -41,12 +41,12 @@ public interface IElasticsearchService {
     /**
      * multiQuery
      *
-     * @param EsMultiBulkBase 复合查询参数
+     * @param esMultiOperParamters 复合查询参数
      * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
      * @Description 复合查询，参数类需要指定索引、类型、id，includefields 属性为可选， 内容为要查询的列
      * @Date 2018/11/30 3:00 PM
      */
-    EsMultiBulkOperResult multiQuery(List<EsMultiBulkBase> EsMultiBulkBase);
+    EsMultiBulkOperResult multiQuery(List<EsMultiOperParamters> esMultiOperParamters);
 
     /**
      * bulkSync

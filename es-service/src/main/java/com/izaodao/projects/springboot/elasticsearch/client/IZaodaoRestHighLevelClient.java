@@ -1,7 +1,7 @@
 package com.izaodao.projects.springboot.elasticsearch.client;
 
 import com.izaodao.projects.springboot.elasticsearch.domain.EsBulkOperParamters;
-import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkBase;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiOperParamters;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
@@ -80,12 +80,12 @@ public interface IZaodaoRestHighLevelClient {
     /**
      * multiQuery
      *
-     * @param multiBulkBases 参数集合
+     * @param multiOperParamters 参数集合
      * @return org.elasticsearch.action.get.MultiGetResponse
      * @Description 复合查询，参数类需要指定索引、类型、id，includefields 属性为可选， 内容为要查询的列
      * @Date 2018/11/30 2:45 PM
      */
-    MultiGetResponse multiQuery(List<EsMultiBulkBase> multiBulkBases);
+    MultiGetResponse multiQuery(List<EsMultiOperParamters> multiOperParamters);
 
     /**
      * bulkSync

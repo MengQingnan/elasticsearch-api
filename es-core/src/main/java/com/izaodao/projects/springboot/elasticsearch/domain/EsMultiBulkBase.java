@@ -1,7 +1,5 @@
 package com.izaodao.projects.springboot.elasticsearch.domain;
 
-import java.util.List;
-
 /**
  * @Auther: Mengqingnan
  * @Description: 复合操作基础属性类
@@ -19,10 +17,6 @@ public class EsMultiBulkBase extends EsBase {
      */
     private String id;
 
-    /**
-     * 复合字段集合
-     */
-    private List<String> includeFields;
 
     public String getId() {
         return id;
@@ -30,13 +24,5 @@ public class EsMultiBulkBase extends EsBase {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public List<String> getIncludeFields() {
-        return includeFields;
-    }
-
-    public void setIncludeFields(List<String> includeFields) {
-        this.includeFields = includeFields;
     }
 }
