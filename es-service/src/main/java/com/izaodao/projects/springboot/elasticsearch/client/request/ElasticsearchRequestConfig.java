@@ -18,6 +18,7 @@ import org.elasticsearch.action.get.MultiGetRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.support.ActiveShardCount;
+import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.common.Strings;
@@ -104,7 +105,8 @@ public class ElasticsearchRequestConfig {
     }
 
     private void configRequest(SearchRequest SearchRequest) {
-
+        // indices options  controls how unavailable indices are resolved and how wildcard expressions are expanded
+        SearchRequest.indicesOptions(IndicesOptions.STRICT_EXPAND_OPEN_FORBID_CLOSED);
     }
 
     private void configRequest(IndexRequest indexRequest) {
