@@ -9,6 +9,11 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.metrics.avg.Avg;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
@@ -20,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +55,7 @@ public class SearchQueryTest {
         searchSourceBuilder.query(QueryBuilders.termQuery("title.keyword", "不确定标题"));
 //            .fuzziness(Fuzziness.AUTO)
 //            .prefixLength(3)
-            //.maxExpansions(10));
+        //.maxExpansions(10));
         searchSourceBuilder.size(10);
         searchSourceBuilder.from(0);
         searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
@@ -62,6 +68,22 @@ public class SearchQueryTest {
         highlightBuilder.field(highlightTitle);
 
         searchSourceBuilder.highlighter(highlightBuilder);
+
+        AggregationBuilder aggregation = AggregationBuilders.terms("titles")
+            .field("title.keyword");
+
+        searchSourceBuilder.aggregation(aggregation);
+
+        AggregationBuilder avgAggregationBuilder = AggregationBuilders.avg("countAvg").field("count");
+
+        searchSourceBuilder.aggregation(avgAggregationBuilder);
+
+        AggregationBuilder filterAggregationBuilder = AggregationBuilders.filter("ids",
+            QueryBuilders.prefixQuery("title.keyword", "不"));
+
+        filterAggregationBuilder.subAggregation(AggregationBuilders.terms("id").field("id.keyword"));
+
+        searchSourceBuilder.aggregation(filterAggregationBuilder);
 
         searchRequest.source(searchSourceBuilder);
 
@@ -78,8 +100,24 @@ public class SearchQueryTest {
             Set<Map.Entry<String, HighlightField>> set = highlightMap.entrySet();
 
             for (Map.Entry<String, HighlightField> entry : set) {
-                System.out.println(entry.getKey()+"===="+entry.getValue());
+                System.out.println(entry.getKey() + "====" + entry.getValue());
             }
+        }
+
+        Aggregations aggregations = searchResponse.getAggregations();
+
+        Terms terms = aggregations.get("titles");
+
+        Avg avg = aggregations.get("countAvg");
+
+        List<Terms.Bucket> buckets = (List<Terms.Bucket>) terms.getBuckets();
+
+        Terms.Bucket bucket1 = terms.getBucketByKey("不确定标题");
+
+        System.out.println(bucket1.getDocCount());
+
+        for (Terms.Bucket bucket: buckets) {
+            System.out.println(bucket.getKey()+"=="+bucket.getDocCount());
         }
     }
 }
