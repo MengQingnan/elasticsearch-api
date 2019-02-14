@@ -1,4 +1,4 @@
-package com.izaodao.projects.springboot.elasticsearch.domain;
+package com.izaodao.projects.springboot.elasticsearch.search;
 
 import org.springframework.util.StringUtils;
 
@@ -21,6 +21,8 @@ public class EsSort implements Serializable {
 
     private SortMode sortMode;
 
+    private MissType missType;
+
     public static enum OrderType {
         ASC, DESC;
     }
@@ -29,11 +31,15 @@ public class EsSort implements Serializable {
         NULL, MIN, MAX, SUM, AVG, MEDIAN;
     }
 
+    public static enum MissType {
+        FIRST, LAST
+    }
 
     public EsSort() {
         this.sort = DEFAULT_SORT;
         this.orderType = OrderType.DESC;
         this.sortMode = SortMode.NULL;
+        this.missType = MissType.LAST;
     }
 
     public EsSort(String sort) {
@@ -41,37 +47,33 @@ public class EsSort implements Serializable {
     }
 
     public EsSort(String sort, OrderType sortType) {
-        this(sort, OrderType.DESC, SortMode.NULL);
+        this(sort, sortType, SortMode.NULL);
     }
 
     public EsSort(String sort, OrderType sortType, SortMode sortMode) {
+        this(sort, sortType, sortMode, MissType.LAST);
+    }
+
+    public EsSort(String sort, OrderType sortType, SortMode sortMode, MissType missType) {
         this.sort = (StringUtils.isEmpty(sort) ? DEFAULT_SORT : sort);
         this.orderType = (sortType == null ? OrderType.DESC : sortType);
         this.sortMode = (sortMode == null ? SortMode.NULL : sortMode);
+        this.missType = (missType == null ? MissType.LAST : missType);
     }
-
 
     public String getSort() {
         return sort;
-    }
-
-    public void setSort(String sort) {
-        this.sort = sort;
     }
 
     public OrderType getOrderType() {
         return orderType;
     }
 
-    public void setOrderType(OrderType orderType) {
-        this.orderType = orderType;
-    }
-
     public SortMode getSortMode() {
         return sortMode;
     }
 
-    public void setSortMode(SortMode sortMode) {
-        this.sortMode = sortMode;
+    public MissType getMissType() {
+        return missType;
     }
 }

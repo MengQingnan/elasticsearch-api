@@ -2,17 +2,30 @@ package com.izaodao.projects.SearchQuery;
 
 import com.izaodao.projects.springboot.elasticsearch.SpringbootApplication;
 import com.izaodao.projects.springboot.elasticsearch.client.ZaodaoRestHighLevelClient;
+import com.izaodao.projects.springboot.elasticsearch.search.EsAggregations;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.MatchPhrasePrefixQueryBuilder;
+import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.avg.Avg;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
@@ -25,6 +38,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,14 +66,27 @@ public class SearchQueryTest {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
         //searchSourceBuilder.query(QueryBuilders.matchQuery("title", "我不确定mqn3").fuzziness(Fuzziness.AUTO)
+
         searchSourceBuilder.query(QueryBuilders.termQuery("title.keyword", "不确定标题"));
-//            .fuzziness(Fuzziness.AUTO)
-//            .prefixLength(3)
-        //.maxExpansions(10));
+
+        String[] a = {"2", "2", "2"};
+
+        QueryBuilders.multiMatchQuery("mqn", a);
+        //BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        QueryBuilder boolQueryBuilder = QueryBuilders.matchQuery("111", "222")
+            .fuzziness(Fuzziness.AUTO)
+            .prefixLength(3)
+            .maxExpansions(10);
+
         searchSourceBuilder.size(10);
         searchSourceBuilder.from(0);
         searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
         searchSourceBuilder.sort("id.keyword", SortOrder.DESC);
+
+        boolQueryBuilder = QueryBuilders.boolQuery()
+            .should(QueryBuilders.matchQuery("111", "222"))
+            .should(QueryBuilders.matchQuery("111", "222"));
+
 
         HighlightBuilder highlightBuilder = new HighlightBuilder();
 
@@ -78,12 +105,16 @@ public class SearchQueryTest {
 
         searchSourceBuilder.aggregation(avgAggregationBuilder);
 
+
         AggregationBuilder filterAggregationBuilder = AggregationBuilders.filter("ids",
             QueryBuilders.prefixQuery("title.keyword", "不"));
 
-        filterAggregationBuilder.subAggregation(AggregationBuilders.terms("id").field("id.keyword"));
+        TermsAggregationBuilder termsAggregationBuilder = AggregationBuilders.terms("id").field("id" + ".keyword");
+
+        filterAggregationBuilder.subAggregation(termsAggregationBuilder);
 
         searchSourceBuilder.aggregation(filterAggregationBuilder);
+
 
         searchRequest.source(searchSourceBuilder);
 
@@ -116,8 +147,47 @@ public class SearchQueryTest {
 
         System.out.println(bucket1.getDocCount());
 
-        for (Terms.Bucket bucket: buckets) {
-            System.out.println(bucket.getKey()+"=="+bucket.getDocCount());
+        for (Terms.Bucket bucket : buckets) {
+            System.out.println(bucket.getKey() + "==" + bucket.getDocCount());
         }
+    }
+
+    public static void main(String[] args) {
+        EsAggregations.Filter filter = EsAggregations.obtainFilter("mqn", EsAggregations.FilterType.MATCH, "llj", "wo");
+
+        List<EsAggregations.Filter> filters = new ArrayList<>();
+
+        filters.add(filter);
+
+        EsAggregations agg = new EsAggregations("name", "mqn", EsAggregations.AggType.MAX, filters);
+
+
+        System.out.println(agg);
+    }
+
+
+    public void test() {
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        boolQueryBuilder.should(QueryBuilders.matchQuery("111", "222"));
+        boolQueryBuilder.should(QueryBuilders.matchQuery("111", "222"));
+        boolQueryBuilder.minimumShouldMatch(2);
+        boolQueryBuilder.filter()
+
+        MatchAllQueryBuilder matchAllQueryBuilder =  QueryBuilders.matchAllQuery();
+
+        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("test","1111");
+
+        MultiMatchQueryBuilder multiMatchQueryBuilder = QueryBuilders.multiMatchQuery();
+
+        MatchPhraseQueryBuilder matchPhraseQueryBuilder = QueryBuilders.matchPhraseQuery();
+
+        MatchPhrasePrefixQueryBuilder matchPhrasePrefixQueryBuilder = QueryBuilders.matchPhrasePrefixQuery();
+
+        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery();
+
+        TermsQueryBuilder termsQueryBuilder = QueryBuilders.termsQuery();
+
+        RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery();
     }
 }

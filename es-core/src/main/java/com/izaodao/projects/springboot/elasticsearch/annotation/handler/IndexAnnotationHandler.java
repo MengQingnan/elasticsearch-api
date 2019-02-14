@@ -12,7 +12,6 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -121,44 +120,14 @@ public class IndexAnnotationHandler {
     }
 
     private String packageBasePath() {
-        //String basePackagePath = recursionGetPath(null);
-        String basePackagePath = this.getClass().getPackage().getName();
-        //
         StringBuilder locationPattern = new StringBuilder();
 
         locationPattern.append("classpath*:");
-        //locationPattern.append(basePackagePath.substring(basePackagePath.indexOf("com/")));
         locationPattern.append("com/izaodao/projects/springboot/");
         locationPattern.append(StringUtils.isEmpty(serviceName)?"**":serviceName);
         locationPattern.append("/**/elasticsearch/*.class");
 
         return locationPattern.toString();
-    }
-
-    private String recursionGetPath(String rootPath) {
-        if (rootPath == null) {
-            rootPath = Thread.currentThread().getContextClassLoader().getResource("").getFile();
-        }
-
-        File rootFile = new File(rootPath);
-        String basePath = null;
-        if (rootFile.isDirectory()) {
-            File[] files = rootFile.listFiles();
-            for (File childFile : files) {
-                if (childFile.getPath().contains("/com")) {
-                    if (childFile.isDirectory()) {
-                        if (childFile.getPath().contains("springboot")) {
-                            basePath = childFile.listFiles()[0].getPath();
-                            break;
-                        } else {
-                            return recursionGetPath(childFile.getPath());
-                        }
-                    }
-                }
-            }
-        }
-
-        return basePath;
     }
 
     private String formatClassName(String className) {

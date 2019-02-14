@@ -1,4 +1,4 @@
-package com.izaodao.projects.springboot.elasticsearch.domain;
+package com.izaodao.projects.springboot.elasticsearch.search;
 
 import java.io.Serializable;
 
