@@ -16,7 +16,6 @@ public class MatchQuery extends EsQuery implements Serializable {
      * 目标域
      */
     private String field;
-
     /**
      * 传入的参数
      */
@@ -48,10 +47,10 @@ public class MatchQuery extends EsQuery implements Serializable {
     private String maxExpansions;
 
     public MatchQuery(String value, String field) {
-        this(value, field, "");
+        this(value, field, 1.0d);
     }
 
-    public MatchQuery(String value, String field, String boost) {
+    public MatchQuery(String value, String field, double boost) {
         super(boost);
         this.field = field;
         this.value = value;

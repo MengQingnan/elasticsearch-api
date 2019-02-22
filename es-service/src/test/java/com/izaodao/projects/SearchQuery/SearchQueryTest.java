@@ -78,6 +78,9 @@ public class SearchQueryTest {
             .prefixLength(3)
             .maxExpansions(10);
 
+        RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("111");
+
+
         searchSourceBuilder.size(10);
         searchSourceBuilder.from(0);
         searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));

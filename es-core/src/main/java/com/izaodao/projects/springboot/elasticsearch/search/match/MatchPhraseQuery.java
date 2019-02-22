@@ -25,20 +25,19 @@ public class MatchPhraseQuery extends EsQuery implements Serializable {
      * 前后偏移量
      */
     private Integer slop;
+    /**
+     * 例如  ik 、english、pinyin  等等
+     */
+    private String analyzer;
 
     public MatchPhraseQuery(String field, String value){
-
+        this(field, value,  1.0d);
     }
 
-    public MatchPhraseQuery(String field, String value, double boost){
-
-    }
-
-    public MatchPhraseQuery(String boost, String field, String value, Integer slop) {
+    public MatchPhraseQuery(String field, String value, double boost) {
         super(boost);
         this.field = field;
         this.value = value;
-        this.slop = slop;
     }
 
     public String getField() {
@@ -63,5 +62,13 @@ public class MatchPhraseQuery extends EsQuery implements Serializable {
 
     public void setSlop(Integer slop) {
         this.slop = slop;
+    }
+
+    public String getAnalyzer() {
+        return analyzer;
+    }
+
+    public void setAnalyzer(String analyzer) {
+        this.analyzer = analyzer;
     }
 }
