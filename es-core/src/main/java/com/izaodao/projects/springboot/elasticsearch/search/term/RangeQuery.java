@@ -19,8 +19,6 @@ public class RangeQuery extends EsQuery implements Serializable {
 
     private Object to;
 
-    private String format ;
-
     private RangeType rangeType;
 
     public static enum RangeType {
