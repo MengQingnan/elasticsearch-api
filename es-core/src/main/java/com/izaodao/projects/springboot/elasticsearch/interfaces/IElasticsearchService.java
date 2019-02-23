@@ -4,6 +4,14 @@ import com.izaodao.projects.springboot.elasticsearch.domain.EsBulkOperParamters;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkOperResult;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiOperParamters;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult;
+import com.izaodao.projects.springboot.elasticsearch.search.bool.BoolQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.match.MatchPhrasePrefixQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.match.MatchPhraseQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.match.MatchQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.match.MultiMatchQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.term.RangeQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.term.TermQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.term.TermsQuery;
 
 import java.util.List;
 
@@ -138,4 +146,92 @@ public interface IElasticsearchService {
      * @Date 2018/11/8 6:47 PM
      */
     EsOperResult deleteAsync(String index, String type, String id);
+    
+    /** 
+     * matchQuery
+     * @Description match 匹配查询
+     * @param index 索引
+     * @param type  类型
+     * @param matchQuery 查询参数
+     * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
+     * @Date 2019-02-23 16:28 
+     */
+    EsOperResult matchQuery(String index, String type, MatchQuery matchQuery);
+
+    /**
+     * matchPhraseQuery
+     * @Description match 短语匹配查询
+     * @param index 索引
+     * @param type  类型
+     * @param matchPhraseQuery 查询参数
+     * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
+     * @Date 2019-02-23 16:29
+     */
+    EsOperResult matchPhraseQuery(String index, String type, MatchPhraseQuery matchPhraseQuery);
+    
+    /** 
+     * matchPhrasePrefixQuery
+     * @Description match 短语前缀匹配查询
+     * @param index 索引
+     * @param type  类型
+     * @param matchPhrasePrefixQuery 查询参数
+     * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
+     * @Date 2019-02-23 16:30 
+     */
+    EsOperResult matchPhrasePrefixQuery(String index, String type, MatchPhrasePrefixQuery matchPhrasePrefixQuery);
+
+    /**
+     * matchMultiQuery
+     * @Description match 多字段复合查询
+     * @param index 索引
+     * @param type  类型
+     * @param multiMatchQuery 查询参数
+     * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
+     * @Date 2019-02-23 16:31
+     */
+    EsOperResult matchMultiQuery(String index, String type, MultiMatchQuery multiMatchQuery);
+    
+    /** 
+     * termQuery
+     * @Description term 精确查询
+     * @param index 索引
+     * @param type  类型
+     * @param termQuery 查询参数
+     * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
+     * @Date 2019-02-23 16:32 
+     */
+    EsOperResult termQuery(String index, String type, TermQuery termQuery);
+    
+    /** 
+     * termsQuery
+     * @Description term 多值查询
+     * @param index 索引
+     * @param type  类型
+     * @param termsQuery 查询参数
+     * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
+     * @Date 2019-02-23 16:32 
+     */
+    EsOperResult termsQuery(String index, String type, TermsQuery termsQuery);
+    
+    /** 
+     * rangeQuery
+     * @Description 范围查询
+     * @param index 索引
+     * @param type  类型
+     * @param rangeQuery  查询参数
+     * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
+     * @Date 2019-02-23 16:32 
+     */
+    EsOperResult rangeQuery(String index, String type, RangeQuery rangeQuery);
+    
+    /** 
+     * boolQuery
+     * @Description bool 查询
+     * @param index 索引
+     * @param type  类型
+     * @param boolQuery 查询参数
+     * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
+     * @Date 2019-02-23 16:32 
+     */
+    EsOperResult boolQuery(String index, String type, BoolQuery boolQuery);
 }

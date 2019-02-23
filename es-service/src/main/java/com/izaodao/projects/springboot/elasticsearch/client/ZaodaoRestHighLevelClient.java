@@ -1,10 +1,12 @@
 package com.izaodao.projects.springboot.elasticsearch.client;
 
+import com.izaodao.projects.springboot.elasticsearch.client.request.IElasticsearchQueryBuilders;
 import com.izaodao.projects.springboot.elasticsearch.client.request.IElasticsearchRequestFactory;
 import com.izaodao.projects.springboot.elasticsearch.client.response.IElasticsearchClientResponseHandle;
 import com.izaodao.projects.springboot.elasticsearch.client.response.ResponseActionListener;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsBulkOperParamters;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiOperParamters;
+import com.izaodao.projects.springboot.elasticsearch.search.EsQuery;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -19,6 +21,7 @@ import org.elasticsearch.action.get.MultiGetRequest;
 import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -50,6 +53,11 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient implements IZ
      * request factory
      */
     private IElasticsearchRequestFactory requestFactory;
+
+    /**
+     *  provide query builder
+     */
+    private IElasticsearchQueryBuilders queryBuilders;
 
     /**
      * response handle
@@ -304,6 +312,11 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient implements IZ
     @Override
     public void deleteAsync(String index, String type, String id) {
         deleteCommon(index, type, id, SyncEnum.ASYNC);
+    }
+
+    @Override
+    public SearchResponse searchQuery(String index, String type, EsQuery esQuery) {
+        return null;
     }
 
     private IndexResponse indexCommon(String index, String type, String id, Object params, SyncEnum syncEnum) {

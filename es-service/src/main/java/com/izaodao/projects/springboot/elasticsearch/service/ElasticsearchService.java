@@ -8,6 +8,14 @@ import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkOperResul
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiOperParamters;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult;
 import com.izaodao.projects.springboot.elasticsearch.interfaces.IElasticsearchService;
+import com.izaodao.projects.springboot.elasticsearch.search.bool.BoolQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.match.MatchPhrasePrefixQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.match.MatchPhraseQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.match.MatchQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.match.MultiMatchQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.term.RangeQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.term.TermQuery;
+import com.izaodao.projects.springboot.elasticsearch.search.term.TermsQuery;
 import com.izaodao.projects.springboot.elasticsearch.service.result.ElasticsearchResultHandle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -93,6 +101,46 @@ public class ElasticsearchService extends ElasticsearchResultHandle implements I
     public EsOperResult deleteAsync(String index, String type, String id) {
         zaodaoRestHighLevelClient.deleteAsync(index, type, id);
         return handleAsyncResult();
+    }
+
+    @Override
+    public EsOperResult matchQuery(String index, String type, MatchQuery matchQuery) {
+        return null;
+    }
+
+    @Override
+    public EsOperResult matchPhraseQuery(String index, String type, MatchPhraseQuery matchPhraseQuery) {
+        return null;
+    }
+
+    @Override
+    public EsOperResult matchPhrasePrefixQuery(String index, String type, MatchPhrasePrefixQuery matchPhrasePrefixQuery) {
+        return null;
+    }
+
+    @Override
+    public EsOperResult matchMultiQuery(String index, String type, MultiMatchQuery multiMatchQuery) {
+        return null;
+    }
+
+    @Override
+    public EsOperResult termQuery(String index, String type, TermQuery termQuery) {
+        return null;
+    }
+
+    @Override
+    public EsOperResult termsQuery(String index, String type, TermsQuery termsQuery) {
+        return null;
+    }
+
+    @Override
+    public EsOperResult rangeQuery(String index, String type, RangeQuery rangeQuery) {
+        return null;
+    }
+
+    @Override
+    public EsOperResult boolQuery(String index, String type, BoolQuery boolQuery) {
+        return null;
     }
 
 }

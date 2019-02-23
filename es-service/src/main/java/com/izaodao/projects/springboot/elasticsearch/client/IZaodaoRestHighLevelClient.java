@@ -2,11 +2,13 @@ package com.izaodao.projects.springboot.elasticsearch.client;
 
 import com.izaodao.projects.springboot.elasticsearch.domain.EsBulkOperParamters;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiOperParamters;
+import com.izaodao.projects.springboot.elasticsearch.search.EsQuery;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateResponse;
 
 import java.io.IOException;
@@ -235,5 +237,15 @@ public interface IZaodaoRestHighLevelClient {
      */
     void deleteAsync(String index, String type, String id);
 
-
+    /**
+     * searchQuery
+     *
+     * @param index      索引
+     * @param type       类型
+     * @param esQuery search 查询
+     * @return org.elasticsearch.action.search.SearchResponse
+     * @Description
+     * @Date 2019-02-23 16:35
+     */
+    SearchResponse searchQuery(String index, String type, EsQuery esQuery);
 }
