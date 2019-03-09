@@ -31,10 +31,10 @@ public class MatchPhraseQuery extends EsQuery implements Serializable {
     private String analyzer;
 
     public MatchPhraseQuery(String field, String value){
-        this(field, value,  1.0d);
+        this(field, value,  1.0f);
     }
 
-    public MatchPhraseQuery(String field, String value, double boost) {
+    public MatchPhraseQuery(String field, String value, float boost) {
         super(boost);
         this.field = field;
         this.value = value;

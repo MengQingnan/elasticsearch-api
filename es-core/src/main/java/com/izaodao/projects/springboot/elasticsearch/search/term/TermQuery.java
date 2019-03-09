@@ -18,10 +18,10 @@ public class TermQuery extends EsQuery implements Serializable {
     private String value;
 
     public TermQuery(String field, String value){
-        this(field, value, 1.0d);
+        this(field, value, 1.0f);
     }
 
-    public TermQuery(String field, String value, double boost) {
+    public TermQuery(String field, String value, float boost) {
         super(boost);
         this.field = field;
         this.value = value;

@@ -16,10 +16,10 @@ public class MatchPhrasePrefixQuery extends MatchPhraseQuery implements Serializ
     private String maxExpansions;
 
     public MatchPhrasePrefixQuery(String field, String value){
-        this(field, value, 1.0d);
+        this(field, value, 1.0f);
     }
 
-    public MatchPhrasePrefixQuery(String field, String value, double boost) {
+    public MatchPhrasePrefixQuery(String field, String value, float boost) {
         super(field, value, boost);
     }
 

@@ -25,10 +25,10 @@ public class BoolQuery extends EsQuery implements Serializable {
     private int minimumShouldMatch;
 
     public BoolQuery (double boost){
-        this(1, 1.0d);
+        this(1, 1.0f);
     }
 
-    public BoolQuery (int minimumShouldMatch, double boost){
+    public BoolQuery (int minimumShouldMatch, float boost){
         super(boost);
         this.minimumShouldMatch = 1;
     }

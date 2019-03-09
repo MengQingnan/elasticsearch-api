@@ -19,10 +19,10 @@ public class TermsQuery extends EsQuery implements Serializable {
     private List<String> values;
 
     public TermsQuery(String field, List<String> values){
-        this(field, values, 1.0d);
+        this(field, values, 1.0f);
     }
 
-    public TermsQuery(String field, List<String> values, double boost) {
+    public TermsQuery(String field, List<String> values, float boost) {
         super(boost);
         this.field = field;
         this.values = values;

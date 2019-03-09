@@ -2,12 +2,14 @@ package com.izaodao.projects.springboot.elasticsearch.config;
 
 import com.izaodao.projects.springboot.elasticsearch.client.IZaodaoRestHighLevelClient;
 import com.izaodao.projects.springboot.elasticsearch.client.ZaodaoElasticsearcRestClientFactory;
+import com.izaodao.projects.springboot.elasticsearch.client.request.ElasticsearchQueryBuilders;
 import com.izaodao.projects.springboot.elasticsearch.client.request.ElasticsearchRequestFactory;
 import com.izaodao.projects.springboot.elasticsearch.client.response.ElasticsearchClientResponseHandle;
 import com.izaodao.projects.springboot.elasticsearch.config.properties.ZaodaoElasticsearchIndexProperties;
 import com.izaodao.projects.springboot.elasticsearch.config.properties.ZaodaoElasticsearchProperties;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.inject.Singleton;
+import org.elasticsearch.common.unit.TimeValue;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -15,6 +17,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Auther: Mengqingnan
@@ -44,7 +48,8 @@ public class ZaodaoElasticsearchAutoConfiguration {
     public ZaodaoElasticsearcRestClientFactory elasticsearcRestClientFactory() {
         return ZaodaoElasticsearcRestClientFactory.createClientFactory(properties,
             new ElasticsearchClientResponseHandle(),
-            new ElasticsearchRequestFactory(indexProperties));
+            new ElasticsearchRequestFactory(indexProperties),
+            new ElasticsearchQueryBuilders(new TimeValue(60, TimeUnit.SECONDS)));
     }
 
     @Bean

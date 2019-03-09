@@ -26,10 +26,10 @@ public class RangeQuery extends EsQuery implements Serializable {
     }
 
     public RangeQuery(String field, RangeType rangeType) {
-        this(field, rangeType, 1.0d);
+        this(field, rangeType, 1.0f);
     }
 
-    public RangeQuery(String field, RangeType rangeType, double boost) {
+    public RangeQuery(String field, RangeType rangeType, float boost) {
         super(boost);
         this.field = field;
         this.rangeType = rangeType;
@@ -57,5 +57,9 @@ public class RangeQuery extends EsQuery implements Serializable {
 
     public void setTo(Object to) {
         this.to = to;
+    }
+
+    public RangeType getRangeType() {
+        return rangeType;
     }
 }

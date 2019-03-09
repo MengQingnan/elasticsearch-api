@@ -43,11 +43,8 @@ public class ElasticsearchResultHandle {
             handleDeleteResponse((DeleteResponse) actionResponse, esOperResult);
         } else if (actionResponse instanceof GetResponse) {
             handleGetResponse((GetResponse) actionResponse, esOperResult);
-        } else if (actionResponse instanceof BulkResponse) {
-
-        } else if (actionResponse instanceof SearchResponse) {
-
-        } else if (actionResponse instanceof MultiGetResponse) {
+        }  else if (actionResponse instanceof SearchResponse) {
+            // TODO
 
         }
 

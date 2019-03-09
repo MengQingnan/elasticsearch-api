@@ -21,6 +21,7 @@ import org.elasticsearch.action.get.MultiGetRequest;
 import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
@@ -28,6 +29,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,10 +80,12 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient implements IZ
 
     ZaodaoRestHighLevelClient(RestClientBuilder restClientBuilder,
                               IElasticsearchClientResponseHandle elasticsearchClientResponseHandle,
-                              IElasticsearchRequestFactory requestFactory) {
+                              IElasticsearchRequestFactory requestFactory,
+                              IElasticsearchQueryBuilders queryBuilders) {
         super(restClientBuilder);
         this.elasticsearchClientResponseHandle = elasticsearchClientResponseHandle;
         this.requestFactory = requestFactory;
+        this.queryBuilders = queryBuilders;
         responseActionListener = new ResponseActionListener(elasticsearchClientResponseHandle);
     }
 
@@ -316,7 +320,24 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient implements IZ
 
     @Override
     public SearchResponse searchQuery(String index, String type, EsQuery esQuery) {
-        return null;
+        SearchRequest searchRequest = requestFactory.obtainRequest(SearchRequest.class);
+        // 设置索引和类型
+        searchRequest.indices(index);
+        searchRequest.types(type);
+
+        SearchSourceBuilder searchSourceBuilder = queryBuilders.produceSearchSourceBuilder(esQuery);
+
+        searchRequest.source(searchSourceBuilder);
+
+        SearchResponse searchResponse = null;
+
+        try {
+             searchResponse = search(searchRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            LOGGER.error(" searchQuery data exception", e);
+        }
+
+        return searchResponse;
     }
 
     private IndexResponse indexCommon(String index, String type, String id, Object params, SyncEnum syncEnum) {

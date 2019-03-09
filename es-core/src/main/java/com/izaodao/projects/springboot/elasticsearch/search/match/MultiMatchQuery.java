@@ -36,10 +36,10 @@ public class MultiMatchQuery extends EsQuery implements Serializable {
     private String type;
 
     public MultiMatchQuery(List<String> fields, String value) {
-        this(fields, value, 1.0d);
+        this(fields, value, 1.0f);
     }
 
-    public MultiMatchQuery(List<String> fields, String value, double boost) {
+    public MultiMatchQuery(List<String> fields, String value, float boost) {
         super(boost);
         this.fields = fields;
         this.value = value;

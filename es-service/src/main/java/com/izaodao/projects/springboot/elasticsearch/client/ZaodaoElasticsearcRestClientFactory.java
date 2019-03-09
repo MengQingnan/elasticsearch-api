@@ -1,5 +1,6 @@
 package com.izaodao.projects.springboot.elasticsearch.client;
 
+import com.izaodao.projects.springboot.elasticsearch.client.request.IElasticsearchQueryBuilders;
 import com.izaodao.projects.springboot.elasticsearch.client.request.IElasticsearchRequestFactory;
 import com.izaodao.projects.springboot.elasticsearch.client.response.IElasticsearchClientResponseHandle;
 import com.izaodao.projects.springboot.elasticsearch.config.properties.ZaodaoElasticsearchProperties;
@@ -45,6 +46,11 @@ public class ZaodaoElasticsearcRestClientFactory {
      * requestFactory
      */
     private IElasticsearchRequestFactory requestFactory;
+    /**
+     * queryBuilders
+     */
+    private IElasticsearchQueryBuilders queryBuilders;
+
 
     /**
      * 单例
@@ -53,10 +59,12 @@ public class ZaodaoElasticsearcRestClientFactory {
 
     private ZaodaoElasticsearcRestClientFactory(ZaodaoElasticsearchProperties properties,
                                                 IElasticsearchClientResponseHandle elasticsearchClientResponseHandle,
-                                                IElasticsearchRequestFactory requestFactory) {
+                                                IElasticsearchRequestFactory requestFactory,
+                                                IElasticsearchQueryBuilders queryBuilders) {
         this.properties = properties;
         this.elasticsearchClientResponseHandle = elasticsearchClientResponseHandle;
         this.requestFactory = requestFactory;
+        this.queryBuilders = queryBuilders;
     }
 
     /**
@@ -100,7 +108,7 @@ public class ZaodaoElasticsearcRestClientFactory {
         }
 
         restHighLevelClient = new ZaodaoRestHighLevelClient(this.restClientBuilder,
-            elasticsearchClientResponseHandle, requestFactory);
+            this.elasticsearchClientResponseHandle, this.requestFactory, this.queryBuilders);
     }
 
     /**
@@ -144,9 +152,10 @@ public class ZaodaoElasticsearcRestClientFactory {
 
     public static ZaodaoElasticsearcRestClientFactory createClientFactory(ZaodaoElasticsearchProperties properties,
                                                                           IElasticsearchClientResponseHandle handle,
-                                                                          IElasticsearchRequestFactory requestFactory) {
+                                                                          IElasticsearchRequestFactory requestFactory,
+                                                                          IElasticsearchQueryBuilders queryBuilders) {
         if (restClientFactory == null) {
-            restClientFactory = new ZaodaoElasticsearcRestClientFactory(properties, handle, requestFactory);
+            restClientFactory = new ZaodaoElasticsearcRestClientFactory(properties, handle, requestFactory,queryBuilders);
 
             return restClientFactory;
         }
