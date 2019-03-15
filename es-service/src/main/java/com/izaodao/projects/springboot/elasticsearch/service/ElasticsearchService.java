@@ -17,6 +17,7 @@ import com.izaodao.projects.springboot.elasticsearch.search.term.RangeQuery;
 import com.izaodao.projects.springboot.elasticsearch.search.term.TermQuery;
 import com.izaodao.projects.springboot.elasticsearch.search.term.TermsQuery;
 import com.izaodao.projects.springboot.elasticsearch.service.result.ElasticsearchResultHandle;
+import org.elasticsearch.action.search.SearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -105,41 +106,49 @@ public class ElasticsearchService extends ElasticsearchResultHandle implements I
 
     @Override
     public EsOperResult matchQuery(String index, String type, MatchQuery matchQuery) {
-        return null;
+        SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, matchQuery);
+        return handleSyncResult(searchResponse);
     }
 
     @Override
     public EsOperResult matchPhraseQuery(String index, String type, MatchPhraseQuery matchPhraseQuery) {
+        SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, matchPhraseQuery);
         return null;
     }
 
     @Override
     public EsOperResult matchPhrasePrefixQuery(String index, String type, MatchPhrasePrefixQuery matchPhrasePrefixQuery) {
+        SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, matchPhrasePrefixQuery);
         return null;
     }
 
     @Override
     public EsOperResult matchMultiQuery(String index, String type, MultiMatchQuery multiMatchQuery) {
+        SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, multiMatchQuery);
         return null;
     }
 
     @Override
     public EsOperResult termQuery(String index, String type, TermQuery termQuery) {
+        SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, termQuery);
         return null;
     }
 
     @Override
     public EsOperResult termsQuery(String index, String type, TermsQuery termsQuery) {
+        SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, termsQuery);
         return null;
     }
 
     @Override
     public EsOperResult rangeQuery(String index, String type, RangeQuery rangeQuery) {
+        SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, rangeQuery);
         return null;
     }
 
     @Override
     public EsOperResult boolQuery(String index, String type, BoolQuery boolQuery) {
+        SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, boolQuery);
         return null;
     }
 

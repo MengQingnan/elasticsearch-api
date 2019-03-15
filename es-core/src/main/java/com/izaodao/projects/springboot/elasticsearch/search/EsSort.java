@@ -32,7 +32,7 @@ public class EsSort implements Serializable {
     }
 
     public static enum MissType {
-        FIRST, LAST
+        FIRST, LAST, CUSTOM;
     }
 
     public EsSort() {

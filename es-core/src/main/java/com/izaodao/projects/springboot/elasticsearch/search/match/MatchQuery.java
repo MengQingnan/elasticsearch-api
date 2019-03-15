@@ -40,11 +40,11 @@ public class MatchQuery extends EsQuery implements Serializable {
     /**
      * 忽略前缀的长度
      */
-    private String prefixLength;
+    private int prefixLength;
     /**
      * 最大扫描长度
      */
-    private String maxExpansions;
+    private int maxExpansions;
 
     public MatchQuery(String value, String field) {
         this(value, field, 1.0f);
@@ -104,19 +104,19 @@ public class MatchQuery extends EsQuery implements Serializable {
         this.fuzziness = fuzziness;
     }
 
-    public String getPrefixLength() {
+    public int getPrefixLength() {
         return prefixLength;
     }
 
-    public void setPrefixLength(String prefixLength) {
+    public void setPrefixLength(int prefixLength) {
         this.prefixLength = prefixLength;
     }
 
-    public String getMaxExpansions() {
+    public int getMaxExpansions() {
         return maxExpansions;
     }
 
-    public void setMaxExpansions(String maxExpansions) {
+    public void setMaxExpansions(int maxExpansions) {
         this.maxExpansions = maxExpansions;
     }
 }

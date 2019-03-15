@@ -44,8 +44,7 @@ public class ElasticsearchResultHandle {
         } else if (actionResponse instanceof GetResponse) {
             handleGetResponse((GetResponse) actionResponse, esOperResult);
         }  else if (actionResponse instanceof SearchResponse) {
-            // TODO
-
+            handleSearchResponse((SearchResponse) actionResponse, esOperResult);
         }
 
         return esOperResult;
@@ -108,6 +107,14 @@ public class ElasticsearchResultHandle {
 
         return esOperResult;
     }
+
+    private EsOperResult handleSearchResponse(SearchResponse searchResponse, EsOperResult esOperResult) {
+        esOperResult.setOperTypeEnum(OperTypeEnum.SEARCH);
+        esOperResult.setResult(searchResponse.toString());
+
+        return esOperResult;
+    }
+
 
     private EsMultiBulkOperResult handleMultiGetResponse(MultiGetResponse multiGetResponse, EsMultiBulkOperResult esMultiBulkOperResult) {
         MultiGetItemResponse[] multiGetItemResponses = multiGetResponse.getResponses();

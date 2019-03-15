@@ -25,7 +25,7 @@ public class MultiMatchQuery extends EsQuery implements Serializable {
     /**
      * 0.0(默认选项，不起作用) 设置该属性后，先获取获取评分最大的field 的文档，再将另一个field的评分*tie_breaker 加上 获取评分最大的field的评分，得到最后的得分 是最终得分
      */
-    private double tieBreaker;
+    private float tieBreaker;
     /**
      * and/or
      */
@@ -61,11 +61,11 @@ public class MultiMatchQuery extends EsQuery implements Serializable {
         this.value = value;
     }
 
-    public double getTieBreaker() {
+    public float getTieBreaker() {
         return tieBreaker;
     }
 
-    public void setTieBreaker(double tieBreaker) {
+    public void setTieBreaker(float tieBreaker) {
         this.tieBreaker = tieBreaker;
     }
 

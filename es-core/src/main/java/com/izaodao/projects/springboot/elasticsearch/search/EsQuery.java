@@ -1,6 +1,7 @@
 package com.izaodao.projects.springboot.elasticsearch.search;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Auther: Mengqingnan
@@ -15,9 +16,11 @@ public class EsQuery implements Serializable {
 
     private EsPaging paging;
 
-    private EsSort sort;
+    private List<EsSort> sorts;
 
-    private EsAggregations aggregations;
+    private EsHighlighter esHighlighter;
+
+    private List<EsAggregations> aggregations;
 
     private EsSuggester suggester;
 
@@ -41,19 +44,19 @@ public class EsQuery implements Serializable {
         this.paging = paging;
     }
 
-    public EsSort getSort() {
-        return sort;
+    public List<EsSort> getSorts() {
+        return sorts;
     }
 
-    public void setSort(EsSort sort) {
-        this.sort = sort;
+    public void setSorts(List<EsSort> sorts) {
+        this.sorts = sorts;
     }
 
-    public EsAggregations getAggregations() {
+    public List<EsAggregations> getAggregations() {
         return aggregations;
     }
 
-    public void setAggregations(EsAggregations aggregations) {
+    public void setAggregations(List<EsAggregations> aggregations) {
         this.aggregations = aggregations;
     }
 
@@ -63,5 +66,17 @@ public class EsQuery implements Serializable {
 
     public void setSuggester(EsSuggester suggester) {
         this.suggester = suggester;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public EsHighlighter getEsHighlighter() {
+        return esHighlighter;
+    }
+
+    public void setEsHighlighter(EsHighlighter esHighlighter) {
+        this.esHighlighter = esHighlighter;
     }
 }

@@ -24,7 +24,7 @@ public class MatchPhraseQuery extends EsQuery implements Serializable {
     /**
      * 前后偏移量
      */
-    private Integer slop;
+    private int slop;
     /**
      * 例如  ik 、english、pinyin  等等
      */
@@ -56,11 +56,11 @@ public class MatchPhraseQuery extends EsQuery implements Serializable {
         this.value = value;
     }
 
-    public Integer getSlop() {
+    public int getSlop() {
         return slop;
     }
 
-    public void setSlop(Integer slop) {
+    public void setSlop(int slop) {
         this.slop = slop;
     }
 

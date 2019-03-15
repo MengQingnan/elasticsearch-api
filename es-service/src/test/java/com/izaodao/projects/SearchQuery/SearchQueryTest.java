@@ -93,6 +93,7 @@ public class SearchQueryTest {
 
         HighlightBuilder highlightBuilder = new HighlightBuilder();
 
+
         HighlightBuilder.Field highlightTitle = new HighlightBuilder.Field("title");
         highlightTitle.highlighterType("unified");
         highlightBuilder.field(highlightTitle);

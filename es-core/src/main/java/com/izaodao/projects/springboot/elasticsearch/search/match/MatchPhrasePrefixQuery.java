@@ -13,7 +13,7 @@ public class MatchPhrasePrefixQuery extends MatchPhraseQuery implements Serializ
     /**
      * 最大扫描长度
      */
-    private String maxExpansions;
+    private int maxExpansions;
 
     public MatchPhrasePrefixQuery(String field, String value){
         this(field, value, 1.0f);
@@ -23,11 +23,11 @@ public class MatchPhrasePrefixQuery extends MatchPhraseQuery implements Serializ
         super(field, value, boost);
     }
 
-    public String getMaxExpansions() {
+    public int getMaxExpansions() {
         return maxExpansions;
     }
 
-    public void setMaxExpansions(String maxExpansions) {
+    public void setMaxExpansions(int maxExpansions) {
         this.maxExpansions = maxExpansions;
     }
 }

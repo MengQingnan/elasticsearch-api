@@ -22,7 +22,7 @@ public class RangeQuery extends EsQuery implements Serializable {
     private RangeType rangeType;
 
     public static enum RangeType {
-        Number, Date
+        Number, Timestamp
     }
 
     public RangeQuery(String field, RangeType rangeType) {

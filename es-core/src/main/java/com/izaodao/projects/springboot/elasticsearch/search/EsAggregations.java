@@ -1,6 +1,7 @@
 package com.izaodao.projects.springboot.elasticsearch.search;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,56 +26,45 @@ public class EsAggregations implements Serializable {
      */
     private AggType aggType;
     /**
-     * 过滤集合(支持多filter)
+     * 过滤的值
      */
-    private List<Filter> filters;
+    private String filterValue;
+    /**
+     * 过滤类型
+     */
+    private FilterType filterType;
+    /**
+     * 区间聚合必须用，区间开始
+     */
+    private double from;
+    /**
+     * 区间聚合必须用，区间截止
+     */
+    private double to;
+
+    /**
+     * 子聚合
+     */
+    private EsAggregations subEsAggregations;
 
     public EsAggregations(String name, String field, AggType aggType) {
-        this(name, field, aggType, null);
-    }
-
-    public EsAggregations(String name, String field, AggType aggType, List<Filter> filters) {
         this.name = name;
         this.field = field;
         this.aggType = aggType;
-        this.filters = filters;
     }
 
     public static enum AggType {
-        TERMS, DATE_RANGE, RANGE, AVG, SUM, MIN, MAX
+        TERMS, DATE_RANGE, RANGE, AVG, SUM, MIN, MAX, Filter;
+
+        public static List<AggType> supportSubAggs(){
+            return Arrays.asList(TERMS,DATE_RANGE,RANGE,Filter);
+        }
     }
 
     public static enum FilterType {
         TERM, MATCH, PREFIX
     }
 
-    public static class Filter {
-        private String name;
-        private FilterType filterType;
-        private String field;
-        private String value;
-
-        public Filter(String name, FilterType filterType, String field, String value) {
-            this.name = name;
-            this.filterType = filterType;
-            this.field = field;
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return "Filter{" +
-                "name='" + name + '\'' +
-                ", filterType=" + filterType +
-                ", field='" + field + '\'' +
-                ", value='" + value + '\'' +
-                '}';
-        }
-    }
-
-    public static Filter obtainFilter(String name, FilterType filterType, String field, String value) {
-        return new Filter(name, filterType, field, value);
-    }
 
     @Override
     public String toString() {
@@ -82,8 +72,41 @@ public class EsAggregations implements Serializable {
             "name='" + name + '\'' +
             ", field='" + field + '\'' +
             ", aggType=" + aggType +
-            ", filters=" + filters +
+            ", filterValue=" + filterValue +
+            ", FilterType=" + filterType +
+            ", from=" + from +
+            ", to=" + to +
             '}';
+    }
+
+    public void addFilterSubEsAggregations(String name, String field, FilterType filterType, String filterValue) {
+        addCommonSubEsAggregations(name, field, AggType.Filter);
+
+        this.subEsAggregations.setFilterType(filterType);
+        this.subEsAggregations.setFilterValue(filterValue);
+    }
+
+    public void addCommonSubEsAggregations(String name, String field, AggType aggType) {
+        if (!AggType.supportSubAggs().contains(this.aggType)) {
+            throw new IllegalArgumentException(" Number agg don't support SubAgg ");
+        }
+        EsAggregations esAggregations = new EsAggregations(name, field, aggType);
+
+        this.subEsAggregations = esAggregations;
+    }
+
+    public void addDateRangeSubEsAggregations(String name, String field, double from, double to) {
+        addCommonSubEsAggregations(name, field, AggType.DATE_RANGE);
+
+        this.subEsAggregations.setFrom(from);
+        this.subEsAggregations.setTo(to);
+    }
+
+    public void addRangeSubEsAggregations(String name, String field, double from, double to) {
+        addCommonSubEsAggregations(name, field, AggType.RANGE);
+
+        this.subEsAggregations.setFrom(from);
+        this.subEsAggregations.setTo(to);
     }
 
     public String getName() {
@@ -98,7 +121,39 @@ public class EsAggregations implements Serializable {
         return aggType;
     }
 
-    public List<Filter> getFilters() {
-        return filters;
+    public String getFilterValue() {
+        return filterValue;
+    }
+
+    public void setFilterValue(String filterValue) {
+        this.filterValue = filterValue;
+    }
+
+    public FilterType getFilterType() {
+        return filterType;
+    }
+
+    public void setFilterType(FilterType filterType) {
+        this.filterType = filterType;
+    }
+
+    public EsAggregations getSubEsAggregations() {
+        return subEsAggregations;
+    }
+
+    public double getFrom() {
+        return from;
+    }
+
+    public void setFrom(double from) {
+        this.from = from;
+    }
+
+    public double getTo() {
+        return to;
+    }
+
+    public void setTo(double to) {
+        this.to = to;
     }
 }
