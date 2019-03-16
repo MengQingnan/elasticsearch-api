@@ -67,7 +67,9 @@ public class EsHighlighter implements Serializable {
         fieldList.add(field);
     }
 
-    public class Field {
+    public class Field implements Serializable {
+        private static final long serialVersionUID = -5619207734346716648L;
+
         private String name;
 
         private Fragmenter fragmenter;

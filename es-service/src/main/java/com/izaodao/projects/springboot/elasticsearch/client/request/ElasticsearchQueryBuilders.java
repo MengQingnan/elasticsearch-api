@@ -507,10 +507,10 @@ public class ElasticsearchQueryBuilders implements IElasticsearchQueryBuilders {
 
             highlightBuilder.order(HighlightBuilder.Order.SCORE);
             highlightBuilder.requireFieldMatch(highlighter.isRequireFieldMatch());
-            if (StringUtils.isEmpty(highlighter.getPreTags())) {
+            if (!StringUtils.isEmpty(highlighter.getPreTags())) {
                 highlightBuilder.preTags(highlighter.getPreTags());
             }
-            if (StringUtils.isEmpty(highlighter.getPostTags())) {
+            if (!StringUtils.isEmpty(highlighter.getPostTags())) {
                 highlightBuilder.postTags(highlighter.getPostTags());
             }
 
