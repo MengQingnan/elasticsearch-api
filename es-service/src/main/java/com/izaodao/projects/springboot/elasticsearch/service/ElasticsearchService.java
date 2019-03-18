@@ -7,6 +7,7 @@ import com.izaodao.projects.springboot.elasticsearch.domain.EsBulkOperParamters;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkOperResult;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiOperParamters;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsSearchResult;
 import com.izaodao.projects.springboot.elasticsearch.interfaces.IElasticsearchService;
 import com.izaodao.projects.springboot.elasticsearch.search.bool.BoolQuery;
 import com.izaodao.projects.springboot.elasticsearch.search.match.MatchPhrasePrefixQuery;
@@ -105,49 +106,49 @@ public class ElasticsearchService extends ElasticsearchResultHandle implements I
     }
 
     @Override
-    public EsOperResult matchQuery(String index, String type, MatchQuery matchQuery) {
+    public EsSearchResult matchQuery(String index, String type, MatchQuery matchQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, matchQuery);
-        return handleSyncResult(searchResponse);
+        return handleSearchResult(searchResponse, matchQuery);
     }
 
     @Override
-    public EsOperResult matchPhraseQuery(String index, String type, MatchPhraseQuery matchPhraseQuery) {
+    public EsSearchResult matchPhraseQuery(String index, String type, MatchPhraseQuery matchPhraseQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, matchPhraseQuery);
         return null;
     }
 
     @Override
-    public EsOperResult matchPhrasePrefixQuery(String index, String type, MatchPhrasePrefixQuery matchPhrasePrefixQuery) {
+    public EsSearchResult matchPhrasePrefixQuery(String index, String type, MatchPhrasePrefixQuery matchPhrasePrefixQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, matchPhrasePrefixQuery);
         return null;
     }
 
     @Override
-    public EsOperResult matchMultiQuery(String index, String type, MultiMatchQuery multiMatchQuery) {
+    public EsSearchResult matchMultiQuery(String index, String type, MultiMatchQuery multiMatchQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, multiMatchQuery);
         return null;
     }
 
     @Override
-    public EsOperResult termQuery(String index, String type, TermQuery termQuery) {
+    public EsSearchResult termQuery(String index, String type, TermQuery termQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, termQuery);
         return null;
     }
 
     @Override
-    public EsOperResult termsQuery(String index, String type, TermsQuery termsQuery) {
+    public EsSearchResult termsQuery(String index, String type, TermsQuery termsQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, termsQuery);
         return null;
     }
 
     @Override
-    public EsOperResult rangeQuery(String index, String type, RangeQuery rangeQuery) {
+    public EsSearchResult rangeQuery(String index, String type, RangeQuery rangeQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, rangeQuery);
         return null;
     }
 
     @Override
-    public EsOperResult boolQuery(String index, String type, BoolQuery boolQuery) {
+    public EsSearchResult boolQuery(String index, String type, BoolQuery boolQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, boolQuery);
         return null;
     }

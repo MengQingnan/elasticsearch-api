@@ -13,6 +13,11 @@ public class EsSearchResult extends EsOperResult implements Serializable {
     private static final long serialVersionUID = -5366297811936843436L;
 
     /**
+     * 查询的总数
+     */
+    private long total;
+
+    /**
      * 查询结果
      */
     private String searchResult;
@@ -36,5 +41,13 @@ public class EsSearchResult extends EsOperResult implements Serializable {
 
     public void setAggResult(String aggResult) {
         this.aggResult = aggResult;
+    }
+
+    public long getTotal() {
+        return total;
+    }
+
+    public void setTotal(long total) {
+        this.total = total;
     }
 }

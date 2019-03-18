@@ -4,6 +4,7 @@ import com.izaodao.projects.springboot.elasticsearch.domain.EsBulkOperParamters;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkOperResult;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiOperParamters;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult;
+import com.izaodao.projects.springboot.elasticsearch.domain.EsSearchResult;
 import com.izaodao.projects.springboot.elasticsearch.search.bool.BoolQuery;
 import com.izaodao.projects.springboot.elasticsearch.search.match.MatchPhrasePrefixQuery;
 import com.izaodao.projects.springboot.elasticsearch.search.match.MatchPhraseQuery;
@@ -156,7 +157,7 @@ public interface IElasticsearchService {
      * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
      * @Date 2019-02-23 16:28 
      */
-    EsOperResult matchQuery(String index, String type, MatchQuery matchQuery);
+    EsSearchResult matchQuery(String index, String type, MatchQuery matchQuery);
 
     /**
      * matchPhraseQuery
@@ -167,7 +168,7 @@ public interface IElasticsearchService {
      * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
      * @Date 2019-02-23 16:29
      */
-    EsOperResult matchPhraseQuery(String index, String type, MatchPhraseQuery matchPhraseQuery);
+    EsSearchResult matchPhraseQuery(String index, String type, MatchPhraseQuery matchPhraseQuery);
     
     /** 
      * matchPhrasePrefixQuery
@@ -178,7 +179,7 @@ public interface IElasticsearchService {
      * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
      * @Date 2019-02-23 16:30 
      */
-    EsOperResult matchPhrasePrefixQuery(String index, String type, MatchPhrasePrefixQuery matchPhrasePrefixQuery);
+    EsSearchResult matchPhrasePrefixQuery(String index, String type, MatchPhrasePrefixQuery matchPhrasePrefixQuery);
 
     /**
      * matchMultiQuery
@@ -189,7 +190,7 @@ public interface IElasticsearchService {
      * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
      * @Date 2019-02-23 16:31
      */
-    EsOperResult matchMultiQuery(String index, String type, MultiMatchQuery multiMatchQuery);
+    EsSearchResult matchMultiQuery(String index, String type, MultiMatchQuery multiMatchQuery);
     
     /** 
      * termQuery
@@ -200,7 +201,7 @@ public interface IElasticsearchService {
      * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
      * @Date 2019-02-23 16:32 
      */
-    EsOperResult termQuery(String index, String type, TermQuery termQuery);
+    EsSearchResult termQuery(String index, String type, TermQuery termQuery);
     
     /** 
      * termsQuery
@@ -211,7 +212,7 @@ public interface IElasticsearchService {
      * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
      * @Date 2019-02-23 16:32 
      */
-    EsOperResult termsQuery(String index, String type, TermsQuery termsQuery);
+    EsSearchResult termsQuery(String index, String type, TermsQuery termsQuery);
     
     /** 
      * rangeQuery
@@ -222,7 +223,7 @@ public interface IElasticsearchService {
      * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
      * @Date 2019-02-23 16:32 
      */
-    EsOperResult rangeQuery(String index, String type, RangeQuery rangeQuery);
+    EsSearchResult rangeQuery(String index, String type, RangeQuery rangeQuery);
     
     /** 
      * boolQuery
@@ -233,5 +234,5 @@ public interface IElasticsearchService {
      * @return com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult
      * @Date 2019-02-23 16:32 
      */
-    EsOperResult boolQuery(String index, String type, BoolQuery boolQuery);
+    EsSearchResult boolQuery(String index, String type, BoolQuery boolQuery);
 }

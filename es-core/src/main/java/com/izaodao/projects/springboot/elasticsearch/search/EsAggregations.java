@@ -59,6 +59,15 @@ public class EsAggregations implements Serializable {
         public static List<AggType> supportSubAggs(){
             return Arrays.asList(TERMS,DATE_RANGE,RANGE,Filter);
         }
+
+        @Override
+        public String toString(){
+            return super.name().toLowerCase();
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(AggType.MAX.toString());
     }
 
     public static enum FilterType {
