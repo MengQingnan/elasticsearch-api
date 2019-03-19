@@ -75,7 +75,7 @@ public interface IElasticsearchService {
      * @Description 异步复合操作，同时执行 新增、修改、删除操作
      * @Date 2018/11/30 2:45 PM
      */
-    EsOperResult bulkAsync(List<EsBulkOperParamters> bulkOperParamters);
+    void bulkAsync(List<EsBulkOperParamters> bulkOperParamters);
 
 
     /**
@@ -100,7 +100,7 @@ public interface IElasticsearchService {
      * @Description 同步构建索引
      * @Date 2018/11/8 6:47 PM
      */
-    EsOperResult indexAsync(String index, String type, String id, String paramJson);
+    void indexAsync(String index, String type, String id, String paramJson);
 
     /**
      * updateSync
@@ -124,7 +124,7 @@ public interface IElasticsearchService {
      * @Description 同步修改索引属性，1.修改的目标对象如果不存在，则进行创建 2.修改的属性如果不存在，则默认新建属性
      * @Date 2018/11/8 6:47 PM
      */
-    EsOperResult updateAsync(String index, String type, String id, String paramJson);
+    void updateAsync(String index, String type, String id, String paramJson);
 
     /**
      * deleteSync
@@ -146,7 +146,7 @@ public interface IElasticsearchService {
      * @Description 删除索引文档
      * @Date 2018/11/8 6:47 PM
      */
-    EsOperResult deleteAsync(String index, String type, String id);
+    void deleteAsync(String index, String type, String id);
     
     /** 
      * matchQuery

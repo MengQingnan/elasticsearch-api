@@ -1,9 +1,11 @@
 package com.izaodao.projects.springboot.elasticsearch.service.result;
 
+import com.alibaba.fastjson.JSON;
 import com.izaodao.projects.springboot.elasticsearch.directory.OperTypeEnum;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsMultiBulkOperResult;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsOperResult;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsSearchResult;
+import com.izaodao.projects.springboot.elasticsearch.search.EsAggregations;
 import com.izaodao.projects.springboot.elasticsearch.search.EsQuery;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.DocWriteRequest;
@@ -19,11 +21,22 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.ParsedSingleBucketAggregation;
+import org.elasticsearch.search.aggregations.bucket.filter.ParsedFilter;
+import org.elasticsearch.search.aggregations.bucket.range.ParsedRange;
+import org.elasticsearch.search.aggregations.bucket.range.Range;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.metrics.avg.ParsedAvg;
+import org.elasticsearch.search.aggregations.metrics.min.ParsedMin;
+import org.elasticsearch.search.aggregations.metrics.sum.ParsedSum;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,13 +97,9 @@ public class ElasticsearchResultHandle {
         // 先处理查询出来的数据
         handleSearchHits(searchResponse, esSearchResult);
         // 在处理聚合数据
-        //handleSearchAggs(esQuery, searchResponse, esSearchResult);
+        handleSearchAggs(esQuery, searchResponse, esSearchResult);
 
         return esSearchResult;
-    }
-
-    protected EsOperResult handleAsyncResult() {
-        return new EsOperResult();
     }
 
     private EsOperResult handleIndexResponse(IndexResponse indexResponse, EsOperResult esOperResult) {
@@ -220,70 +229,113 @@ public class ElasticsearchResultHandle {
                 }
             }
 
-            queryResult.add(sourceMap.toString());
+            queryResult.add(JSON.toJSONString(sourceMap));
         }
 
         esSearchResult.setSearchResult(queryResult.toString());
     }
 
-//    private void handleSearchAggs(EsQuery esQuery, SearchResponse searchResponse, EsSearchResult esSearchResult) {
-//        SearchHits searchHits = searchResponse.getHits();
-//
-//        Aggregations aggregations = searchResponse.getAggregations();
-//
-//        SearchHit[] searchHitss = searchHits.getHits();
-//
-//        for (SearchHit searchHit : searchHitss) {
-//            System.out.println(searchHit.getSourceAsString());
-//        }
-//
-//        List<EsAggregations> esAggregations = esQuery.getAggregations();
-//
-//        for (EsAggregations esAggregation : esAggregations) {
-//            if (esAggregation.getAggType() == EsAggregations.AggType.TERMS) {
-//                ParsedStringTerms parsedStringTerms = aggregations.get(esAggregation.getName());
-//
-//                List<Terms.Bucket> buckets = (List<Terms.Bucket>) parsedStringTerms.getBuckets();
-//                System.out.println(parsedStringTerms.getName());
-//                System.out.println(parsedStringTerms.getType());
-//                for (Terms.Bucket bucket : buckets) {
-//                    System.out.println(bucket.getKeyAsString());
-//                    System.out.println(bucket.getDocCount());
-//                }
-//            } else if (esAggregation.getAggType() == EsAggregations.AggType.RANGE) {
-//                ParsedRange parsedRange = aggregations.get(esAggregation.getName());
-//            } else if (esAggregation.getAggType() == EsAggregations.AggType.DATE_RANGE) {
-//                ParsedDateRange parsedDateRange = aggregations.get(esAggregation.getName());
-//            } else if (esAggregation.getAggType() == EsAggregations.AggType.SUM) {
-//                ParsedSum parsedSum = aggregations.get(esAggregation.getName());
-//            } else if (esAggregation.getAggType() == EsAggregations.AggType.AVG) {
-//                ParsedAvg parsedAvg = aggregations.get(esAggregation.getName());
-//            } else if (esAggregation.getAggType() == EsAggregations.AggType.SUM) {
-//                ParsedSum parsedSum = aggregations.get(esAggregation.getName());
-//            } else if (esAggregation.getAggType() == EsAggregations.AggType.MIN) {
-//                ParsedMin parsedMin = aggregations.get(esAggregation.getName());
-//            } else if (esAggregation.getAggType() == EsAggregations.AggType.Filter) {
-//                ParsedFilters parsedFilters = aggregations.get(esAggregation.getName());
-//
-//                List<Filters.Bucket> buckets = (List<Filters.Bucket>) parsedFilters.getBuckets();
-//
-//                System.out.println(parsedFilters.getName());
-//                System.out.println(parsedFilters.getType());
-//
-//                for (Filters.Bucket bucket : buckets) {
-//                    System.out.println(bucket.getKeyAsString());
-//                    System.out.println(bucket.getDocCount());
-//
-//                    Aggregations aggregations1 = bucket.getAggregations();
-//
-//                    ParsedSum parsedSum = aggregations1.get(esAggregation.getSubEsAggregations().getName());
-//
-//                    System.out.println(parsedSum.getValue());
-//                    System.out.println(parsedSum.getName());
-//
-//                }
-//            }
-//        }
-//    }
+    private void handleSearchAggs(EsQuery esQuery, SearchResponse searchResponse, EsSearchResult esSearchResult) {
+        // 从结果中获取聚合结果集合
+        Aggregations aggregations = searchResponse.getAggregations();
+        // 本次统计的类型
+        List<EsAggregations> esAggregations = esQuery.getAggregations();
+        // 聚合Map
+        Map<String, Object> aggMap = new HashMap<>();
+        // 遍历本次统计类型
+        for (EsAggregations esAggregation : esAggregations) {
+            recursionHandleAggResult(aggMap, esAggregation, aggregations);
+        }
 
+        System.out.println(JSON.toJSONString(aggMap));
+    }
+
+    private void recursionHandleAggResult(Map<String, Object> aggMap, EsAggregations esAggregation, Aggregations aggregations) {
+        if (esAggregation.getAggType() == EsAggregations.AggType.TERMS) {
+            ParsedStringTerms parsedStringTerms = aggregations.get(esAggregation.getName());
+
+            List<Terms.Bucket> buckets = (List<Terms.Bucket>) parsedStringTerms.getBuckets();
+
+            List<Map<String, Object>> bucketList = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(buckets)) {
+                for (Terms.Bucket bucket : buckets) {
+                    Map<String, Object> subMap = new HashMap<>();
+
+                    subMap.put("key", bucket.getKeyAsString());
+                    subMap.put("docCount", bucket.getDocCount());
+
+                    bucketList.add(subMap);
+
+                    Aggregations subAggregations = bucket.getAggregations();
+
+                    if (subAggregations != null && !CollectionUtils.isEmpty(subAggregations.asList())) {
+                        // 递归调用
+                        recursionHandleAggResult(subMap, esAggregation.getSubEsAggregations(), subAggregations);
+                    }
+                }
+                aggMap.put(parsedStringTerms.getName(), bucketList);
+            }
+        } else if (esAggregation.getAggType() == EsAggregations.AggType.RANGE ||
+            esAggregation.getAggType() == EsAggregations.AggType.DATE_RANGE) {
+            ParsedRange parsedRange = aggregations.get(esAggregation.getName());
+
+            List<Range.Bucket> buckets = (List<Range.Bucket>) parsedRange.getBuckets();
+            if (!CollectionUtils.isEmpty(buckets)) {
+                Range.Bucket bucket = buckets.get(0);
+
+                Map<String, Object> subMap = new HashMap<>();
+
+                subMap.put("docCount", bucket.getDocCount());
+
+                Aggregations subAggregations = bucket.getAggregations();
+
+                if (subAggregations != null && !CollectionUtils.isEmpty(subAggregations.asList())) {
+                    // 递归调用
+                    recursionHandleAggResult(subMap, esAggregation.getSubEsAggregations(), subAggregations);
+                }
+
+                aggMap.put(parsedRange.getName(), subMap);
+            }
+        } else if (esAggregation.getAggType() == EsAggregations.AggType.Filter) {
+            ParsedFilter parsedFilter = aggregations.get(esAggregation.getName());
+
+            if (parsedFilter != null) {
+                Map<String, Object> filterMap = parsedSingleBucketAggregation(parsedFilter, esAggregation);
+
+                aggMap.put(parsedFilter.getName(), filterMap);
+            }
+
+        } else if (esAggregation.getAggType() == EsAggregations.AggType.SUM) {
+            ParsedSum parsedSum = aggregations.get(esAggregation.getName());
+
+            aggMap.put(esAggregation.getName(), parsedSum.getValue());
+        } else if (esAggregation.getAggType() == EsAggregations.AggType.AVG) {
+            ParsedAvg parsedAvg = aggregations.get(esAggregation.getName());
+
+            aggMap.put(esAggregation.getName(), parsedAvg.getValue());
+        } else if (esAggregation.getAggType() == EsAggregations.AggType.SUM) {
+            ParsedSum parsedSum = aggregations.get(esAggregation.getName());
+
+            aggMap.put(esAggregation.getName(), parsedSum.getValue());
+        } else if (esAggregation.getAggType() == EsAggregations.AggType.MIN) {
+            ParsedMin parsedMin = aggregations.get(esAggregation.getName());
+
+            aggMap.put(esAggregation.getName(), parsedMin.getValue());
+        }
+    }
+
+    public Map<String, Object> parsedSingleBucketAggregation(ParsedSingleBucketAggregation parsedSingleBucketAggregation, EsAggregations esAggregation) {
+        Map<String, Object> subMap = new HashMap<>();
+
+        subMap.put("docCount", parsedSingleBucketAggregation.getDocCount());
+
+        Aggregations subAggregations = parsedSingleBucketAggregation.getAggregations();
+
+        if (subAggregations != null && !CollectionUtils.isEmpty(subAggregations.asList())) {
+            // 递归调用
+            recursionHandleAggResult(subMap, esAggregation.getSubEsAggregations(), subAggregations);
+        }
+
+        return subMap;
+    }
 }

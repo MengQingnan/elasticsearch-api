@@ -60,16 +60,14 @@ public class ElasticsearchService extends ElasticsearchResultHandle implements I
     }
 
     @Override
-    public EsOperResult bulkAsync(List<EsBulkOperParamters> bulkOperParamters) {
+    public void bulkAsync(List<EsBulkOperParamters> bulkOperParamters) {
         zaodaoRestHighLevelClient.bulkAsync(bulkOperParamters);
-        return handleAsyncResult();
     }
 
     @Override
-    public EsOperResult indexAsync(String index, String type, String id, String paramJson) {
+    public void indexAsync(String index, String type, String id, String paramJson) {
         Map<String, Object> params = JSON.parseObject(paramJson, Map.class);
         zaodaoRestHighLevelClient.indexAsync(index, type, id, params);
-        return handleAsyncResult();
     }
 
     @Override
@@ -87,11 +85,10 @@ public class ElasticsearchService extends ElasticsearchResultHandle implements I
     }
 
     @Override
-    public EsOperResult updateAsync(String index, String type, String id, String paramJson) {
+    public void updateAsync(String index, String type, String id, String paramJson) {
         Map<String, Object> params = JSON.parseObject(paramJson, Map.class);
 
         zaodaoRestHighLevelClient.updateAsync(index, type, id, params);
-        return handleAsyncResult();
     }
 
     @Override
@@ -100,9 +97,8 @@ public class ElasticsearchService extends ElasticsearchResultHandle implements I
     }
 
     @Override
-    public EsOperResult deleteAsync(String index, String type, String id) {
+    public void deleteAsync(String index, String type, String id) {
         zaodaoRestHighLevelClient.deleteAsync(index, type, id);
-        return handleAsyncResult();
     }
 
     @Override

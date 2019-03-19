@@ -56,12 +56,12 @@ public class EsAggregations implements Serializable {
     public static enum AggType {
         TERMS, DATE_RANGE, RANGE, AVG, SUM, MIN, MAX, Filter;
 
-        public static List<AggType> supportSubAggs(){
-            return Arrays.asList(TERMS,DATE_RANGE,RANGE,Filter);
+        public static List<AggType> supportSubAggs() {
+            return Arrays.asList(TERMS, DATE_RANGE, RANGE, Filter);
         }
 
         @Override
-        public String toString(){
+        public String toString() {
             return super.name().toLowerCase();
         }
     }
@@ -98,6 +98,8 @@ public class EsAggregations implements Serializable {
     public void addCommonSubEsAggregations(String name, String field, AggType aggType) {
         if (!AggType.supportSubAggs().contains(this.aggType)) {
             throw new IllegalArgumentException(" Number agg don't support SubAgg ");
+        } else if (subEsAggregations != null) {
+            throw new IllegalArgumentException(" SubEsAggregations exist only one ");
         }
         EsAggregations esAggregations = new EsAggregations(name, field, aggType);
 

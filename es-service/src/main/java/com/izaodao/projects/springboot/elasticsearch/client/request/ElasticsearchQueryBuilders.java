@@ -28,7 +28,7 @@ import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.filter.FiltersAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
@@ -480,11 +480,11 @@ public class ElasticsearchQueryBuilders implements IElasticsearchQueryBuilders {
             queryBuilder = QueryBuilders.termQuery(aggregation.getField(), aggregation.getFilterValue());
         }
 
-        FiltersAggregationBuilder filtersAggregationBuilder = AggregationBuilders.filters(aggregation.getName(), queryBuilder);
+        FilterAggregationBuilder filterAggregationBuilder = AggregationBuilders.filter(aggregation.getName(), queryBuilder);
 
-        handleSubAgg(aggregation, filtersAggregationBuilder);
+        handleSubAgg(aggregation, filterAggregationBuilder);
 
-        return filtersAggregationBuilder;
+        return filterAggregationBuilder;
     }
 
     private void handleSubAgg(EsAggregations aggregation, AggregationBuilder aggregationBuilder) {
