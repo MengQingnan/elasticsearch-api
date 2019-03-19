@@ -3,7 +3,7 @@ package com.izaodao.projects.springboot.elasticsearch.rest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.izaodao.projects.springboot.elasticsearch.client.IZaodaoRestHighLevelClient;
-import com.izaodao.projects.springboot.elasticsearch.config.dictionary.JTypeMatchEsTypeEnum;
+import com.izaodao.projects.springboot.elasticsearch.config.dictionary.DataTypeMatchEnum;
 import com.izaodao.projects.springboot.elasticsearch.domain.EsIndexParamters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -66,21 +66,21 @@ public class IndexRestController {
         for (Map.Entry<String, Object> entry : mappings.entrySet()) {
             Map<String, Object> objectMap = new HashMap<>();
 
-            JTypeMatchEsTypeEnum jTypeMatchEsTypeEnum = JTypeMatchEsTypeEnum.parse((String) entry.getValue());
+            DataTypeMatchEnum dataTypeMatchEnum = DataTypeMatchEnum.parse((String) entry.getValue());
 
-            if (jTypeMatchEsTypeEnum != null) {
-                if (!StringUtils.isEmpty(jTypeMatchEsTypeEnum.getEsTypeSecond())) {
+            if (dataTypeMatchEnum != null) {
+                if (!StringUtils.isEmpty(dataTypeMatchEnum.getEsTypeSecond())) {
                     Map<String, Object> fieldsMap = new HashMap<>();
                     Map<String, Object> keywordMap = new HashMap<>();
 
-                    keywordMap.put("type", jTypeMatchEsTypeEnum.getEsTypeSecond());
+                    keywordMap.put("type", dataTypeMatchEnum.getEsTypeSecond());
                     keywordMap.put("ignore_above", 256);
 
                     fieldsMap.put("keyword", keywordMap);
                     objectMap.put("fields", fieldsMap);
                 }
 
-                objectMap.put("type", jTypeMatchEsTypeEnum.getEsTypeFirst());
+                objectMap.put("type", dataTypeMatchEnum.getEsTypeFirst());
 
                 properties.put(entry.getKey(), objectMap);
             }

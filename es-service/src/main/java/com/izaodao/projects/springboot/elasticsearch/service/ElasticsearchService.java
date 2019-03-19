@@ -110,43 +110,43 @@ public class ElasticsearchService extends ElasticsearchResultHandle implements I
     @Override
     public EsSearchResult matchPhraseQuery(String index, String type, MatchPhraseQuery matchPhraseQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, matchPhraseQuery);
-        return null;
+        return handleSearchResult(searchResponse, matchPhraseQuery);
     }
 
     @Override
     public EsSearchResult matchPhrasePrefixQuery(String index, String type, MatchPhrasePrefixQuery matchPhrasePrefixQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, matchPhrasePrefixQuery);
-        return null;
+        return handleSearchResult(searchResponse, matchPhrasePrefixQuery);
     }
 
     @Override
     public EsSearchResult matchMultiQuery(String index, String type, MultiMatchQuery multiMatchQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, multiMatchQuery);
-        return null;
+        return handleSearchResult(searchResponse, multiMatchQuery);
     }
 
     @Override
     public EsSearchResult termQuery(String index, String type, TermQuery termQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, termQuery);
-        return null;
+        return handleSearchResult(searchResponse, termQuery);
     }
 
     @Override
     public EsSearchResult termsQuery(String index, String type, TermsQuery termsQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, termsQuery);
-        return null;
+        return handleSearchResult(searchResponse, termsQuery);
     }
 
     @Override
     public EsSearchResult rangeQuery(String index, String type, RangeQuery rangeQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, rangeQuery);
-        return null;
+        return handleSearchResult(searchResponse, rangeQuery);
     }
 
     @Override
     public EsSearchResult boolQuery(String index, String type, BoolQuery boolQuery) {
         SearchResponse searchResponse = zaodaoRestHighLevelClient.searchQuery(index, type, boolQuery);
-        return null;
+        return handleSearchResult(searchResponse, boolQuery);
     }
 
 }

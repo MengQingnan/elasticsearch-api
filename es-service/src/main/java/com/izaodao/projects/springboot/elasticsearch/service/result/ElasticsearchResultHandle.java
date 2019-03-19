@@ -22,7 +22,6 @@ import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.bucket.ParsedSingleBucketAggregation;
 import org.elasticsearch.search.aggregations.bucket.filter.ParsedFilter;
 import org.elasticsearch.search.aggregations.bucket.range.ParsedRange;
 import org.elasticsearch.search.aggregations.bucket.range.Range;
@@ -247,7 +246,7 @@ public class ElasticsearchResultHandle {
             recursionHandleAggResult(aggMap, esAggregation, aggregations);
         }
 
-        System.out.println(JSON.toJSONString(aggMap));
+        esSearchResult.setAggResult(JSON.toJSONString(aggMap));
     }
 
     private void recursionHandleAggResult(Map<String, Object> aggMap, EsAggregations esAggregation, Aggregations aggregations) {
@@ -259,19 +258,10 @@ public class ElasticsearchResultHandle {
             List<Map<String, Object>> bucketList = new ArrayList<>();
             if (!CollectionUtils.isEmpty(buckets)) {
                 for (Terms.Bucket bucket : buckets) {
-                    Map<String, Object> subMap = new HashMap<>();
-
-                    subMap.put("key", bucket.getKeyAsString());
-                    subMap.put("docCount", bucket.getDocCount());
+                    Map<String, Object> subMap = differentiateAggregation(bucket, esAggregation);
 
                     bucketList.add(subMap);
 
-                    Aggregations subAggregations = bucket.getAggregations();
-
-                    if (subAggregations != null && !CollectionUtils.isEmpty(subAggregations.asList())) {
-                        // 递归调用
-                        recursionHandleAggResult(subMap, esAggregation.getSubEsAggregations(), subAggregations);
-                    }
                 }
                 aggMap.put(parsedStringTerms.getName(), bucketList);
             }
@@ -283,16 +273,7 @@ public class ElasticsearchResultHandle {
             if (!CollectionUtils.isEmpty(buckets)) {
                 Range.Bucket bucket = buckets.get(0);
 
-                Map<String, Object> subMap = new HashMap<>();
-
-                subMap.put("docCount", bucket.getDocCount());
-
-                Aggregations subAggregations = bucket.getAggregations();
-
-                if (subAggregations != null && !CollectionUtils.isEmpty(subAggregations.asList())) {
-                    // 递归调用
-                    recursionHandleAggResult(subMap, esAggregation.getSubEsAggregations(), subAggregations);
-                }
+                Map<String, Object> subMap = differentiateAggregation(bucket, esAggregation);
 
                 aggMap.put(parsedRange.getName(), subMap);
             }
@@ -300,7 +281,7 @@ public class ElasticsearchResultHandle {
             ParsedFilter parsedFilter = aggregations.get(esAggregation.getName());
 
             if (parsedFilter != null) {
-                Map<String, Object> filterMap = parsedSingleBucketAggregation(parsedFilter, esAggregation);
+                Map<String, Object> filterMap = differentiateAggregation(parsedFilter, esAggregation);
 
                 aggMap.put(parsedFilter.getName(), filterMap);
             }
@@ -324,12 +305,32 @@ public class ElasticsearchResultHandle {
         }
     }
 
-    public Map<String, Object> parsedSingleBucketAggregation(ParsedSingleBucketAggregation parsedSingleBucketAggregation, EsAggregations esAggregation) {
+    public Map<String, Object> differentiateAggregation(Object aggregation, EsAggregations esAggregation) {
         Map<String, Object> subMap = new HashMap<>();
 
-        subMap.put("docCount", parsedSingleBucketAggregation.getDocCount());
+        Aggregations subAggregations = null;
 
-        Aggregations subAggregations = parsedSingleBucketAggregation.getAggregations();
+        if (aggregation instanceof Range.Bucket) {
+            Range.Bucket bucket = (Range.Bucket) aggregation;
+
+            subMap.put("docCount", bucket.getDocCount());
+
+            subAggregations = bucket.getAggregations();
+        } else if (aggregation instanceof ParsedFilter) {
+            ParsedFilter parsedFilter = (ParsedFilter) aggregation;
+
+            subMap.put("docCount", parsedFilter.getDocCount());
+
+            subAggregations = parsedFilter.getAggregations();
+        } else if (aggregation instanceof  Terms.Bucket) {
+            Terms.Bucket bucket = (Terms.Bucket) aggregation;
+
+            subMap.put("key", bucket.getKeyAsString());
+            subMap.put("docCount", bucket.getDocCount());
+
+            subAggregations = bucket.getAggregations();
+        }
+
 
         if (subAggregations != null && !CollectionUtils.isEmpty(subAggregations.asList())) {
             // 递归调用

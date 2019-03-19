@@ -10,6 +10,7 @@ import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.get.MultiGetItemResponse;
 import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,8 @@ public final class ElasticsearchClientResponseHandle implements IElasticsearchCl
             handleResponse((MultiGetResponse) response);
         } else if (response instanceof BulkResponse) {
             handleResponse((BulkResponse) response);
+        } else if (response instanceof SearchResponse) {
+            handleResponse((SearchResponse) response);
         }
     }
 
@@ -96,4 +99,9 @@ public final class ElasticsearchClientResponseHandle implements IElasticsearchCl
             LOGGER.debug("result:" + bulkResponse.getResponse().getResult());
         }
     }
+
+    private void handleResponse(SearchResponse searchResponse) {
+        LOGGER.debug("result:" + searchResponse.toString());
+    }
+
 }

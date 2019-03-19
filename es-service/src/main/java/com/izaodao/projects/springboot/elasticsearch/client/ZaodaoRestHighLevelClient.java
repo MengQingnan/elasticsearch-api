@@ -57,7 +57,7 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient implements IZ
     private IElasticsearchRequestFactory requestFactory;
 
     /**
-     *  provide query builder
+     * provide query builder
      */
     private IElasticsearchQueryBuilders queryBuilders;
 
@@ -332,7 +332,9 @@ public class ZaodaoRestHighLevelClient extends RestHighLevelClient implements IZ
         SearchResponse searchResponse = null;
 
         try {
-             searchResponse = search(searchRequest, RequestOptions.DEFAULT);
+            searchResponse = search(searchRequest, RequestOptions.DEFAULT);
+
+            elasticsearchClientResponseHandle.asyncHandleResponse(searchResponse);
         } catch (IOException e) {
             LOGGER.error(" searchQuery data exception", e);
         }
