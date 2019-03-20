@@ -55,8 +55,6 @@ public class EsHighlighter implements Serializable {
 
         if (StringUtils.isEmpty(name)) {
             throw new NullPointerException("EsHighlighter field name is empty!");
-        } else if (fieldList.size() > 0 && this.requireFieldMatch == Boolean.TRUE) {
-            throw new IllegalStateException("RequireFieldMatch is true that just highlight one!");
         }
 
         Field field = new Field();
