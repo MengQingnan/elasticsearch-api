@@ -25,11 +25,13 @@ public class EsHighlighter implements Serializable {
     private List<Field> fieldList;
 
     public EsHighlighter() {
-        this(Boolean.FALSE);
+        this(Boolean.TRUE);
     }
 
     public EsHighlighter(boolean requireFieldMatch) {
         this.requireFieldMatch = requireFieldMatch;
+        this.preTags = "<em class='hightlight'>";
+        this.postTags = "</em>";
         fieldList = new ArrayList<>();
     }
 
